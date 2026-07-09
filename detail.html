@@ -1,1 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"> <!-- 修正了 chartset 为 charset -->
+    <title>详情页 - 自制网</title>
+    <style>
+      /* ========== 全局样式 ========== */
+      /* 页面基础：清除默认边距，设置背景与字体 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box; /* 让边框和内边距不影响元素总宽高，方便布局计算 */
+      }
 
+      body {
+        background-color: #ADD8E6; /* 淡蓝色背景，与首页统一 */
+        font-family: "微软雅黑", sans-serif;
+        height: 100vh; /* 占满浏览器可视高度，让侧边栏可以撑满 */
+        display: flex; /* 使用flex布局，让侧边栏和主内容区并排 */
+      }
+
+      /* ========== 侧边栏样式 ========== */
+      .sidebar {
+        width: 220px; /* 侧边栏宽度 */
+        background-color: #2c3e50; /* 深色背景，与导航栏风格一致 */
+        color: #ffffff;
+        padding: 20px 15px;
+        display: flex;
+        flex-direction: column; /* 让侧边栏内部元素纵向排列 */
+        flex-shrink: 0; /* 防止侧边栏被压缩 */
+        height: 100vh; /* 撑满整个视口高度 */
+        position: sticky; /* 让侧边栏固定在视口左侧，滚动时不会移出视野 */
+        top: 0;
+        overflow-y: auto; /* 如果侧边栏内容太多，允许内部滚动 */
+      }
+
+      /* 侧边栏标题（或Logo区域） */
+      .sidebar h2 {
+        color: #87CEFA;
+        font-size: 1.4em;
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #4a5a6a;
+        margin-bottom: 20px;
+      }
+
+      /* 侧边栏菜单列表 */
+      .sidebar ul {
+        list-style: none; /* 去掉项目符号 */
+        padding: 0;
+        margin: 0;
+      }
+
+      /* 每个菜单项 */
+      .sidebar li {
+        margin-bottom: 8px;
+      }
+
+      /* 菜单按钮（点击切换内容的触发元素） */
+      .sidebar button {
+        width: 100%; /* 按钮占满侧边栏宽度 */
+        background: none;
+        border: none;
+        color: #d0d7de;
+        font-size: 1em;
+        padding: 12px 15px;
+        text-align: left;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+        font-family: inherit; /* 继承全局字体 */
+      }
+
+      /* 鼠标悬停时的样式 */
+      .sidebar button:hover {
+        background-color: #3a4a5a;
+        color: #ffffff;
+      }
+
+      /* 当前激活的菜单项（高亮） */
+      .sidebar button.active {
+        background-color: #1a2a3a;
+        color: #87CEFA;
+        font-weight: bold;
+        border-left: 4px solid #87CEFA; /* 左侧加一条亮色竖线，更醒目 */
+      }
+
+      /* ========== 主内容区域 ========== */
+      .main-content {
+        flex: 1; /* 占据剩余所有空间 */
+        padding: 40px 50px;
+        overflow-y: auto; /* 如果内容太多，允许滚动 */
+        text-align: left; /* 内容左对齐，更符合阅读习惯 */
+      }
+
+      /* 内容区的标题 */
+      .main-content h1 {
+        color: #2c3e50;
+        font-size: 2.2em;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      /* 内容区的卡片（显示具体内容） */
+      .content-card {
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        min-height: 200px;
+      }
+
+      .content-card h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .content-card p {
+        color: #333;
+        font-size: 1.05em;
+        line-height: 1.7;
+      }
+
+      /* 返回首页的链接，放在内容区底部 */
+      .back-link {
+        display: inline-block;
+        margin-top: 40px;
+        color: #2c3e50;
+        text-decoration: none;
+        border: 1px solid #2c3e50;
+        padding: 10px 24px;
+        border-radius: 30px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .back-link:hover {
+        background-color: #2c3e50;
+        color: white;
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <!-- ========== 侧边栏 ========== -->
+    <!-- 注意：侧边栏的每个按钮的 data-target 属性，对应着内容区要显示的 id -->
+    <nav class="sidebar">
+      <h2>📂 导航</h2>
+      <ul>
+        <li><button class="active" data-target="section-intro">📖 简介</button></li>
+        <li><button data-target="section-features">✨ 特色</button></li>
+        <li><button data-target="section-tools">🛠️ 工具</button></li>
+        <li><button data-target="section-updates">📰 更新</button></li>
+        <!-- 后续要增加更多菜单项，直接复制 <li> 这一行，修改 data-target 和显示文字即可 -->
+      </ul>
+      <!-- 侧边栏底部可预留空间，方便以后添加社交链接等 -->
+    </nav>
+
+    <!-- ========== 主内容区 ========== -->
+    <main class="main-content">
+      <h1>📖 详情页</h1>
+
+      <!-- 内容卡片容器：所有内容区块都放在这里，通过 JavaScript 控制显示/隐藏 -->
+      <div class="content-card" id="section-intro">
+        <h2>📌 简介</h2>
+        <p> 本站由我一人独自与AI斗智斗勇所制</p>
+        <p>本站创立于公元2026年7月9日</p>
+        <P>如你所见，本站有许多功能未开发，但也快了</P>
+        <p>节俭风</p>
+        <p style="color: #555; font-size: 0.95em;">（当前为示例内容，后续可按需修改）</p>
+      </div>
+
+      <div class="content-card" id="section-features" style="display: none;">
+        <h2>✨ 特色功能</h2>
+        <p>这里可以展示你的网站或你本人的特色内容。</p>
+        <ul style="margin-left: 20px; color: #333; line-height: 1.8;">
+          <li>📌 特色一：例如“每日更新资源”</li>
+          <li>📌 特色二：例如“简洁无广告”</li>
+          <li>📌 特色三：例如“所有工具免费使用”</li>
+        </ul>
+      </div>
+
+      <div class="content-card" id="section-tools" style="display: none;">
+        <h2>🛠️ 常用工具</h2>
+        <p>这里可以列出你推荐或收集的工具资源。</p>
+        <ul style="margin-left: 20px; color: #333; line-height: 1.8;">
+          <li>🔧 <strong>工具A</strong>：简短说明</li>
+          <li>🔧 <strong>工具B</strong>：简短说明</li>
+          <li>🔧 <strong>工具C</strong>：简短说明</li>
+        </ul>
+      </div>
+
+      <div class="content-card" id="section-updates" style="display: none;">
+        <h2>📰 更新日志</h2>
+        <p>这里记录网站的更新动态。</p>
+        <ul style="margin-left: 20px; color: #333; line-height: 1.8;">
+          <li>📅 2025-07-09：侧边栏功能上线，支持点击切换内容。</li>
+          <li>📅 2025-07-08：详情页框架搭建完成。</li>
+        </ul>
+        <p style="color: #555; font-size: 0.95em;">（后续可在此追加更新记录）</p>
+      </div>
+
+      <!-- 返回首页的链接 -->
+      <a href="index.html" class="back-link">← 返回首页</a>
+    </main>
+
+    <!-- ========== JavaScript 交互脚本 ========== -->
+    <!-- 功能：点击侧边栏按钮时，切换对应的内容区块显示，并高亮当前按钮 -->
+    <script>
+      // 1. 获取所有侧边栏按钮
+      const buttons = document.querySelectorAll('.sidebar button');
+      // 2. 获取所有内容卡片
+      const cards = document.querySelectorAll('.content-card');
+
+      // 3. 为每个按钮绑定点击事件
+      buttons.forEach(button => {
+        button.addEventListener('click', function() {
+          // 3a. 移除所有按钮的 'active' 类（取消高亮）
+          buttons.forEach(btn => btn.classList.remove('active'));
+          // 3b. 为当前点击的按钮添加 'active' 类（高亮）
+          this.classList.add('active');
+
+          // 3c. 获取当前按钮要显示的内容区块的 id
+          const targetId = this.getAttribute('data-target'); // 从 data-target 属性读取
+
+          // 3d. 隐藏所有内容卡片
+          cards.forEach(card => {
+            card.style.display = 'none';
+          });
+
+          // 3e. 显示与当前按钮对应的内容卡片
+          const targetCard = document.getElementById(targetId);
+          if (targetCard) {
+            targetCard.style.display = 'block';
+          } else {
+            console.warn('未找到 id 为 ' + targetId + ' 的内容区块');
+          }
+        });
+      });
+
+      // 说明：如果你要在侧边栏增加新菜单项，需要同时做两件事：
+      // 1. 在 <ul> 里新增一个 <li><button data-target="新的id">显示名称</button></li>
+      // 2. 在 <div class="content-card"> 区域新增一个 id="新的id" 的内容块
+      // 不需要修改 JavaScript 代码，它会自动适配。
+    </script>
+
+  </body>
+</html>
