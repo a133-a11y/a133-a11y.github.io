@@ -1,1 +1,1066 @@
+<!DOCTYPE html>
+<!-- 声明文档类型为HTML5，告诉浏览器按标准模式解析 -->
+<html>
+<!-- HTML文档开始 -->
 
+<head>
+    <!-- head部分：存放网页的元数据和样式，内容不会直接显示在页面上 -->
+
+    <meta charset="utf-8">
+    <!-- 字符编码声明：告诉浏览器使用UTF-8编码，正确显示中文和特殊字符 -->
+
+    <title>资源中心 - 自制网</title>
+    <!-- 网页标题：显示在浏览器标签栏上，也是搜索引擎抓取的重要信息 -->
+
+    <style>
+        /* ============================================================
+               style标签：存放所有CSS样式代码，控制网页的外观
+               注释：以下所有样式都写在 style 标签内
+               ============================================================ */
+
+        /* ===== 全局重置 ===== */
+        /* 作用：清除浏览器默认的边距和内边距，让所有元素的尺寸计算更一致 */
+
+        * {
+            margin: 0;
+            /* 清除所有元素默认的外边距 */
+            padding: 0;
+            /* 清除所有元素默认的内边距 */
+            box-sizing: border-box;
+            /* 让边框和内边距算在元素总宽高内，方便布局 */
+        }
+
+        /* ===== body：页面主体样式 ===== */
+        body {
+            background-color: #ADD8E6;
+            /* 背景颜色：浅蓝色，与全站统一 */
+            font-family: "微软雅黑", sans-serif;
+            /* 字体：优先使用微软雅黑，系统没有则回退到无衬线字体 */
+            height: 100vh;
+            /* 高度：占满浏览器可视窗口的100% */
+            display: flex;
+            /* 使用flex弹性布局，让侧边栏和主内容区并排 */
+        }
+
+        /* ============================================================
+               侧边栏样式（左侧导航区域）
+               ============================================================ */
+
+        /* .sidebar：侧边栏容器 */
+        .sidebar {
+            width: 260px;
+            /* 固定宽度260像素 */
+            background-color: #2c3e50;
+            /* 深灰蓝色背景，与页面浅蓝形成对比 */
+            color: #ffffff;
+            /* 文字颜色为白色，在深色背景上清晰 */
+            padding: 20px 16px;
+            /* 内边距：上下20px，左右16px，让内容不贴边 */
+            display: flex;
+            /* 使用flex布局，方便内部元素纵向排列 */
+            flex-direction: column;
+            /* 让内部元素纵向排列（从上到下） */
+            flex-shrink: 0;
+            /* 当窗口变窄时，侧边栏宽度不变，不被压缩 */
+            height: 100vh;
+            /* 高度占满整个视口 */
+            position: sticky;
+            /* 粘性定位：滚动时侧边栏固定在左侧不移动 */
+            top: 0;
+            /* 粘性定位的偏移值，从顶部开始 */
+            overflow-y: auto;
+            /* 如果侧边栏内容过多，允许内部垂直滚动 */
+        }
+
+        /* .sidebar h2：侧边栏顶部的标题 */
+        .sidebar h2 {
+            color: #87CEFA;
+            /* 亮蓝色文字，与深色背景形成对比 */
+            font-size: 1.4em;
+            /* 字体大小：1.4倍于父元素 */
+            text-align: center;
+            /* 文字居中 */
+            padding-bottom: 16px;
+            /* 下内边距16px，与下方内容保持距离 */
+            border-bottom: 1px solid #4a5a6a;
+            /* 底部边框：1像素实线，灰蓝色，作为分隔线 */
+            margin-bottom: 16px;
+            /* 下外边距16px，与下方列表保持距离 */
+        }
+
+        /* .sidebar ul：侧边栏的无序列表（菜单列表） */
+        .sidebar ul {
+            list-style: none;
+            /* 去掉列表项前面的项目符号（圆点） */
+            padding: 0;
+            /* 清除默认内边距 */
+            margin: 0;
+            /* 清除默认外边距 */
+        }
+
+        /* .sidebar li：每个菜单项 */
+        .sidebar li {
+            margin-bottom: 2px;
+            /* 每个菜单项之间留2像素间距 */
+        }
+
+        /* ============================================================
+               侧边栏按钮（普通项）样式
+               普通项：点击后直接切换右侧内容，不展开子菜单
+               ============================================================ */
+
+        .sidebar button {
+            width: 100%;
+            /* 按钮宽度占满父容器 */
+            background: none;
+            /* 背景透明，无填充色 */
+            border: none;
+            /* 无边框 */
+            color: #d0d7de;
+            /* 文字颜色：浅灰白色 */
+            font-size: 1em;
+            /* 字体大小：继承父元素 */
+            padding: 10px 14px;
+            /* 内边距：上下10px，左右14px */
+            text-align: left;
+            /* 文字左对齐 */
+            border-radius: 6px;
+            /* 圆角6像素，让按钮更柔和 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针，表示可点击 */
+            transition: background 0.2s, color 0.2s;
+            /* 过渡动画：背景和颜色变化时在0.2秒内平滑过渡 */
+            font-family: inherit;
+            /* 字体继承父元素（微软雅黑） */
+        }
+
+        /* .sidebar button:hover：鼠标悬停在按钮上时的效果 */
+        .sidebar button:hover {
+            background-color: #3a4a5a;
+            /* 背景变为深灰蓝色 */
+            color: #ffffff;
+            /* 文字变为纯白色 */
+        }
+
+        /* .sidebar button.active：当前被选中的按钮（高亮状态） */
+        .sidebar button.active {
+            background-color: #1a2a3a;
+            /* 背景变为更深色 */
+            color: #87CEFA;
+            /* 文字变为亮蓝色 */
+            font-weight: bold;
+            /* 文字加粗 */
+            border-left: 4px solid #87CEFA;
+            /* 左侧加一条4像素的亮蓝色竖线，更醒目 */
+        }
+
+        /* ============================================================
+               可展开的父级按钮样式
+               父级按钮：点击后展开/收起子菜单（如“MC 我的世界”）
+               ============================================================ */
+
+        .sidebar .parent-btn {
+            display: flex;
+            /* 使用flex布局，让文字和箭头横排 */
+            justify-content: space-between;
+            /* 两端对齐：文字在左，箭头在右 */
+            align-items: center;
+            /* 垂直居中 */
+            width: 100%;
+            /* 宽度占满父容器 */
+            background: none;
+            /* 背景透明 */
+            border: none;
+            /* 无边框 */
+            color: #d0d7de;
+            /* 文字颜色：浅灰白色 */
+            font-size: 1em;
+            /* 字体大小：继承父元素 */
+            padding: 10px 14px;
+            /* 内边距：上下10px，左右14px */
+            text-align: left;
+            /* 文字左对齐 */
+            border-radius: 6px;
+            /* 圆角6像素 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针 */
+            transition: background 0.2s, color 0.2s;
+            /* 过渡动画：平滑变化 */
+            font-family: inherit;
+            /* 字体继承父元素 */
+        }
+
+        /* .sidebar .parent-btn:hover：鼠标悬停在父级按钮上 */
+        .sidebar .parent-btn:hover {
+            background-color: #3a4a5a;
+            /* 背景变为深灰蓝色 */
+            color: #ffffff;
+            /* 文字变为纯白色 */
+        }
+
+        /* .sidebar .parent-btn .arrow：父级按钮右侧的箭头（▶ 或 ▼） */
+        .sidebar .parent-btn .arrow {
+            font-size: 0.8em;
+            /* 箭头字体稍微小一点 */
+            transition: transform 0.3s;
+            /* 旋转动画：0.3秒内平滑旋转 */
+        }
+
+        /* .sidebar .parent-btn .arrow.open：箭头展开状态（旋转90度，变成▼） */
+        .sidebar .parent-btn .arrow.open {
+            transform: rotate(90deg);
+            /* 旋转90度，原本的 ▶ 变成 ▼ */
+        }
+
+        /* ============================================================
+               子菜单样式（默认隐藏，点击父级按钮后展开）
+               ============================================================ */
+
+        /* .sidebar .sub-menu：子菜单列表（包裹子项） */
+        .sidebar .sub-menu {
+            list-style: none;
+            /* 去掉项目符号 */
+            padding-left: 20px;
+            /* 左内边距20px，让子菜单向右缩进 */
+            margin: 2px 0 6px 0;
+            /* 外边距：上2px，右0，下6px，左0 */
+            max-height: 0;
+            /* 最大高度为0，默认隐藏 */
+            overflow: hidden;
+            /* 超出部分隐藏 */
+            transition: max-height 0.3s ease;
+            /* 展开/收起动画：0.3秒平滑过渡 */
+        }
+
+        /* .sidebar .sub-menu.open：子菜单展开状态 */
+        .sidebar .sub-menu.open {
+            max-height: 400px;
+            /* 最大高度设为400px，足够显示所有子项 */
+        }
+
+        /* .sidebar .sub-menu li：子菜单中的每个列表项 */
+        .sidebar .sub-menu li {
+            margin-bottom: 1px;
+            /* 子项之间留1像素间距 */
+        }
+
+        /* .sidebar .sub-menu button：子菜单中的按钮 */
+        .sidebar .sub-menu button {
+            padding-left: 28px;
+            /* 左内边距28px，比父级缩进更多 */
+            font-size: 0.92em;
+            /* 字体稍微小一点，体现层级 */
+            color: #b0b8c0;
+            /* 文字颜色：浅灰色 */
+        }
+
+        /* .sidebar .sub-menu button:hover：子菜单按钮悬停效果 */
+        .sidebar .sub-menu button:hover {
+            color: #ffffff;
+            /* 悬停时文字变白 */
+            background-color: #3a4a5a;
+            /* 悬停时背景变深 */
+        }
+
+        /* .sidebar .sub-menu button.active：子菜单按钮被选中（高亮） */
+        .sidebar .sub-menu button.active {
+            color: #87CEFA;
+            /* 文字变为亮蓝色 */
+            background-color: #1a2a3a;
+            /* 背景变深 */
+            border-left: 3px solid #87CEFA;
+            /* 左侧加一条3像素亮蓝色竖线 */
+        }
+
+        /* ============================================================
+               返回首页链接（侧边栏底部）
+               ============================================================ */
+
+        /* .sidebar .back-home：返回首页的容器 */
+        .sidebar .back-home {
+            margin-top: auto;
+            /* 自动上外边距，把链接推到侧边栏底部 */
+            padding-top: 16px;
+            /* 上内边距16px */
+            border-top: 1px solid #4a5a6a;
+            /* 上边框：1像素灰蓝色实线，作为分隔线 */
+            text-align: center;
+            /* 文字居中 */
+        }
+
+        /* .sidebar .back-home a：返回首页的链接 */
+        .sidebar .back-home a {
+            color: #87CEFA;
+            /* 文字颜色：亮蓝色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            font-size: 0.95em;
+            /* 字体大小：稍微小一点 */
+            display: block;
+            /* 块级显示，占满整行 */
+            padding: 10px;
+            /* 内边距10px，增加点击区域 */
+            border-radius: 6px;
+            /* 圆角6像素 */
+            transition: background 0.2s;
+            /* 背景变化时平滑过渡 */
+        }
+
+        /* .sidebar .back-home a:hover：返回链接悬停效果 */
+        .sidebar .back-home a:hover {
+            background-color: #3a4a5a;
+            /* 悬停时背景变深 */
+        }
+
+        /* ============================================================
+               主内容区样式（右侧内容区域）
+               ============================================================ */
+
+        /* .main-content：主内容容器 */
+        .main-content {
+            flex: 1;
+            /* 占据剩余所有空间（侧边栏固定宽度，剩下的都给主内容） */
+            padding: 30px 45px;
+            /* 内边距：上下30px，左右45px */
+            overflow-y: auto;
+            /* 如果内容过多，允许垂直滚动 */
+        }
+
+        /* .main-content h1：主内容区的一级标题 */
+        .main-content h1 {
+            color: #2c3e50;
+            /* 深灰蓝色 */
+            font-size: 2.2em;
+            /* 大号字体 */
+            margin-bottom: 6px;
+            /* 与下方保持间距 */
+        }
+
+        /* .main-content .subtitle：副标题/描述文字 */
+        .main-content .subtitle {
+            color: #2c3e50;
+            /* 深灰蓝色 */
+            font-size: 1em;
+            /* 标准大小 */
+            margin-bottom: 25px;
+            /* 与下方保持间距 */
+            opacity: 0.7;
+            /* 透明度70%，让文字稍微淡一点，不那么抢眼 */
+        }
+
+        /* ============================================================
+               资源列表样式（按领域分类显示）
+               ============================================================ */
+
+        /* .resource-section：每个资源分类的内容区块（默认隐藏） */
+        .resource-section {
+            display: none;
+            /* 默认隐藏，只有被激活（添加 active 类）时才显示 */
+        }
+
+        /* .resource-section.active：当前激活显示的资源区块 */
+        .resource-section.active {
+            display: block;
+            /* 显示为块级元素 */
+        }
+
+        /* .resource-section h2：资源分类的标题 */
+        .resource-section h2 {
+            color: #2c3e50;
+            /* 深灰蓝色 */
+            font-size: 1.5em;
+            /* 中等大小 */
+            margin-bottom: 15px;
+            /* 与下方保持间距 */
+            border-bottom: 2px solid #2c3e50;
+            /* 底部边框：2像素实线，作为分隔线 */
+            padding-bottom: 8px;
+            /* 下内边距8px，让文字和边框有距离 */
+        }
+
+        /* ============================================================
+               单个资源项的样式（每个资源占一行）
+               ============================================================ */
+
+        /* .resource-item：单个资源项 */
+        .resource-item {
+            background-color: rgba(255, 255, 255, 0.6);
+            /* 背景：半透明白色（透明度60%） */
+            border-radius: 10px;
+            /* 圆角10像素 */
+            padding: 14px 20px;
+            /* 内边距：上下14px，左右20px */
+            margin-bottom: 10px;
+            /* 每个资源项之间留10像素间距 */
+            display: flex;
+            /* 使用flex布局，让信息在左，按钮在右 */
+            justify-content: space-between;
+            /* 两端对齐：信息在左，按钮在右 */
+            align-items: center;
+            /* 垂直居中 */
+            transition: background 0.2s;
+            /* 背景变化时平滑过渡 */
+            border-left: 4px solid #2c3e50;
+            /* 左侧边框：4像素实线，深灰蓝色，作为装饰 */
+        }
+
+        /* .resource-item:hover：鼠标悬停在资源项上 */
+        .resource-item:hover {
+            background-color: rgba(255, 255, 255, 0.85);
+            /* 悬停时背景透明度提高到85%，更亮 */
+        }
+
+        /* .resource-item .info：资源信息容器（名称 + 描述） */
+        .resource-item .info {
+            display: flex;
+            /* 使用flex布局 */
+            flex-direction: column;
+            /* 纵向排列：名称在上，描述在下 */
+            text-align: left;
+            /* 文字左对齐 */
+        }
+
+        /* .resource-item .info .name：资源名称 */
+        .resource-item .info .name {
+            font-weight: bold;
+            /* 加粗 */
+            color: #2c3e50;
+            /* 深灰蓝色 */
+            font-size: 1.05em;
+            /* 稍微大一点 */
+        }
+
+        /* .resource-item .info .desc：资源描述 */
+        .resource-item .info .desc {
+            color: #555;
+            /* 中灰色 */
+            font-size: 0.9em;
+            /* 稍微小一点 */
+            margin-top: 2px;
+            /* 与名称保持2像素间距 */
+        }
+
+        /* .resource-item .download-btn：下载按钮 */
+        .resource-item .download-btn {
+            background-color: #2c3e50;
+            /* 背景：深灰蓝色 */
+            color: white;
+            /* 文字白色 */
+            border: none;
+            /* 无边框 */
+            padding: 6px 18px;
+            /* 内边距：上下6px，左右18px */
+            border-radius: 20px;
+            /* 圆角20像素，胶囊形状 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针 */
+            font-size: 0.85em;
+            /* 字体稍微小一点 */
+            transition: background 0.3s;
+            /* 背景变化时平滑过渡 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            font-family: inherit;
+            /* 字体继承父元素 */
+        }
+
+        /* .resource-item .download-btn:hover：下载按钮悬停效果 */
+        .resource-item .download-btn:hover {
+            background-color: #1a2a3a;
+            /* 悬停时背景变深 */
+        }
+
+        /* .empty-tip：空状态提示（当分类下暂无资源时显示） */
+        .empty-tip {
+            color: #555;
+            /* 中灰色 */
+            font-style: italic;
+            /* 斜体 */
+            padding: 20px 0;
+            /* 内边距：上下20px，左右0 */
+        }
+
+        /* ============================================================
+               响应式设计：手机窄屏适配
+               当屏幕宽度小于700px时，侧边栏变为横向排列
+               ============================================================ */
+
+        @media (max-width: 700px) {
+            /* 媒体查询：当屏幕宽度 ≤ 700px 时生效 */
+
+            body {
+                flex-direction: column;
+                /* body改为纵向排列，侧边栏在上，主内容在下 */
+            }
+
+            .sidebar {
+                width: 100%;
+                /* 侧边栏宽度占满 */
+                height: auto;
+                /* 高度自适应 */
+                position: relative;
+                /* 取消粘性定位，跟随滚动 */
+                flex-direction: row;
+                /* 侧边栏内部改为横向排列 */
+                flex-wrap: wrap;
+                /* 如果一行放不下，允许换行 */
+                padding: 12px 15px;
+                /* 减小内边距，适应窄屏 */
+                align-items: center;
+                /* 垂直居中 */
+            }
+
+            .sidebar h2 {
+                width: 100%;
+                /* 标题占满一行 */
+                margin-bottom: 8px;
+                /* 减小下边距 */
+                padding-bottom: 8px;
+                /* 减小下内边距 */
+            }
+
+            .sidebar ul {
+                display: flex;
+                /* 菜单项横向排列 */
+                flex-wrap: wrap;
+                /* 允许换行 */
+                gap: 4px;
+                /* 菜单项之间的间距 */
+            }
+
+            .sidebar li {
+                margin-bottom: 0;
+                /* 取消默认下边距 */
+            }
+
+            .sidebar button,
+            .sidebar .parent-btn {
+                padding: 6px 12px;
+                /* 减小内边距，适应窄屏 */
+                font-size: 0.85em;
+                /* 减小字体 */
+            }
+
+            .sidebar .sub-menu {
+                padding-left: 10px;
+                /* 减小缩进 */
+            }
+
+            .sidebar .sub-menu button {
+                padding-left: 16px;
+                /* 减小缩进 */
+                font-size: 0.8em;
+                /* 减小字体 */
+            }
+
+            .sidebar .back-home {
+                margin-top: 0;
+                /* 取消自动上外边距 */
+                padding-top: 0;
+                /* 取消上内边距 */
+                border-top: none;
+                /* 取消上边框 */
+                margin-left: auto;
+                /* 靠右对齐 */
+            }
+
+            .main-content {
+                padding: 20px;
+                /* 减小主内容区内边距 */
+            }
+        }
+        /* ===== 样式部分结束 ===== */
+    </style>
+    <!-- style标签结束 -->
+</head>
+<!-- head部分结束 -->
+
+<body>
+    <!-- ============================================================
+           body部分：网页的“身体”，所有可见内容都写在这里
+           ============================================================ -->
+
+    <!-- ============================================================
+           侧边栏（左侧导航区域） - 开始
+           ============================================================ -->
+    <nav class="sidebar">
+        <!-- nav标签：语义化标签，表示导航区域 -->
+        <!-- class="sidebar"：应用侧边栏样式 -->
+
+        <h2>📂 资源领域</h2>
+        <!-- 侧边栏标题，显示在顶部 -->
+
+        <ul>
+            <!-- 无序列表：包含所有菜单项 -->
+
+            <!-- ============================================================
+                 可展开项：MC（我的世界）
+                 结构：父级按钮 + 子菜单
+                 ============================================================ -->
+            <li>
+                <!-- 列表项：包含父级按钮和子菜单 -->
+
+                <!-- 父级按钮：点击后展开/收起子菜单 -->
+                <!-- class="parent-btn"：标识这是可展开的父级按钮 -->
+                <!-- data-target：自定义属性，用于标识这个按钮对应的内容区（此处暂未使用） -->
+                <button class="parent-btn" data-target="section-mc">
+                    <!-- button标签：可点击的按钮 -->
+                    <!-- 按钮文字：图标 + 分类名称 -->
+                    <span>⛏️ MC 我的世界</span>
+                    <!-- span标签：包裹文字部分 -->
+                    <span class="arrow">▶</span>
+                    <!-- span标签：右侧箭头，class="arrow" 用于控制旋转动画 -->
+                </button>
+
+                <!-- 子菜单：包含子项列表 -->
+                <!-- class="sub-menu"：标识这是子菜单，默认隐藏（max-height:0） -->
+                <ul class="sub-menu">
+                    <!-- 子项1：启动器 -->
+                    <li>
+                        <!-- data-target：指向主内容区中对应的资源区块id -->
+                        <button data-target="section-mc-launcher">🚀 启动器</button>
+                    </li>
+                    <!-- 子项2：模组 -->
+                    <li>
+                        <button data-target="section-mc-mods">🧩 模组</button>
+                    </li>
+                    <!-- 子项3：材质包 -->
+                    <li>
+                        <button data-target="section-mc-resource">🎨 材质包</button>
+                    </li>
+                    <!-- 子项4：服务端 -->
+                    <li>
+                        <button data-target="section-mc-server">🖥️ 服务端</button>
+                    </li>
+                </ul>
+                <!-- 子菜单结束 -->
+            </li>
+            <!-- MC 可展开项结束 -->
+
+            <!-- ============================================================
+                 普通项（点击直接切换内容，不展开子菜单）
+                 每个普通项就是一个按钮，点击后右侧显示对应的资源列表
+                 ============================================================ -->
+
+            <!-- 设计工具（默认激活状态） -->
+            <!-- class="active"：表示当前被选中，高亮显示 -->
+            <li><button class="active" data-target="section-design">🎨 设计工具</button></li>
+
+            <!-- 开发工具 -->
+            <li><button data-target="section-dev">💻 开发工具</button></li>
+
+            <!-- 办公效率 -->
+            <li><button data-target="section-office">📄 办公效率</button></li>
+
+            <!-- ============================================================
+                 另一个可展开项示例：游戏资源
+                 ============================================================ -->
+            <li>
+                <!-- 父级按钮 -->
+                <button class="parent-btn" data-target="section-games">
+                    <span>🎮 游戏资源</span>
+                    <span class="arrow">▶</span>
+                </button>
+                <!-- 子菜单 -->
+                <ul class="sub-menu">
+                    <li><button data-target="section-games-steam">🛒 Steam 工具</button></li>
+                    <li><button data-target="section-games-emu">📟 模拟器</button></li>
+                </ul>
+            </li>
+            <!-- 游戏资源可展开项结束 -->
+
+            <!-- 更多普通项 -->
+            <li><button data-target="section-media">🎬 影音处理</button></li>
+            <li><button data-target="section-other">📦 其他资源</button></li>
+
+        </ul>
+        <!-- 菜单列表结束 -->
+
+        <!-- 返回首页链接（侧边栏底部） -->
+        <div class="back-home">
+            <!-- a标签：超链接，点击跳转到 index.html（首页） -->
+            <a href="index.html">← 返回首页</a>
+        </div>
+
+    </nav>
+    <!-- ============================================================
+           侧边栏 - 结束
+           ============================================================ -->
+
+    <!-- ============================================================
+           主内容区（右侧内容区域） - 开始
+           ============================================================ -->
+    <main class="main-content">
+        <!-- main标签：语义化标签，表示主要内容区域 -->
+
+        <h1>📦 资源中心</h1>
+        <!-- 页面主标题 -->
+
+        <p class="subtitle">选择左侧领域，浏览相关资源 — 点击「下载」进入下载页</p>
+        <!-- 页面副标题/引导文字 -->
+
+        <!-- ============================================================
+             MC 各子项内容区块
+             每个区块对应侧边栏子菜单中的一个按钮
+             通过 id 与侧边栏按钮的 data-target 对应
+             默认全部隐藏（display:none），点击侧边栏按钮后显示对应的
+             ============================================================ -->
+
+        <!-- MC - 启动器内容 -->
+        <!-- id="section-mc-launcher"：与侧边栏子项 data-target="section-mc-launcher" 对应 -->
+        <div class="resource-section" id="section-mc-launcher">
+            <h2>🚀 MC 启动器</h2>
+            <!-- 分类标题 -->
+
+            <!-- 资源项1：HMCL -->
+            <div class="resource-item">
+                <!-- 资源信息 -->
+                <div class="info">
+                    <span class="name">HMCL</span>
+                    <!-- 资源名称 -->
+                    <span class="desc">开源 Minecraft 启动器，支持多版本</span>
+                    <!-- 资源描述 -->
+                </div>
+                <!-- 下载按钮：点击跳转到 download.html，通过 ?id=hmcl 传递资源标识 -->
+                <a href="download.html?id=hmcl" class="download-btn">下载</a>
+            </div>
+
+            <!-- 资源项2：PCL2 -->
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">PCL2</span>
+                    <span class="desc">Plain Craft Launcher 2，国内常用启动器</span>
+                </div>
+                <a href="download.html?id=pcl2" class="download-btn">下载</a>
+            </div>
+
+            <!-- 资源项3：BakaXL -->
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">BakaXL</span>
+                    <span class="desc">界面美观的 MC 启动器</span>
+                </div>
+                <a href="download.html?id=bakaxl" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- MC - 启动器内容结束 -->
+
+        <!-- MC - 模组内容 -->
+        <div class="resource-section" id="section-mc-mods">
+            <h2>🧩 MC 模组</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">OptiFine</span>
+                    <span class="desc">优化性能，支持光影</span>
+                </div>
+                <a href="download.html?id=optifine" class="download-btn">下载</a>
+            </div>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Forge</span>
+                    <span class="desc">模组加载器（API）</span>
+                </div>
+                <a href="download.html?id=forge" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- MC - 模组内容结束 -->
+
+        <!-- MC - 材质包内容 -->
+        <div class="resource-section" id="section-mc-resource">
+            <h2>🎨 MC 材质包</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Faithful</span>
+                    <span class="desc">经典高清原版风格材质包</span>
+                </div>
+                <a href="download.html?id=faithful" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- MC - 材质包内容结束 -->
+
+        <!-- MC - 服务端内容 -->
+        <div class="resource-section" id="section-mc-server">
+            <h2>🖥️ MC 服务端</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Paper</span>
+                    <span class="desc">高性能 Spigot 分支服务端</span>
+                </div>
+                <a href="download.html?id=paper" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- MC - 服务端内容结束 -->
+
+        <!-- ============================================================
+             其他普通领域的内容区块
+             ============================================================ -->
+
+        <!-- 设计工具（默认激活显示） -->
+        <!-- class="active"：这个区块默认显示，因为侧边栏的“设计工具”按钮默认也是 active -->
+        <div class="resource-section active" id="section-design">
+            <h2>🎨 设计工具</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Photoshop 2025</span>
+                    <span class="desc">专业图像编辑软件</span>
+                </div>
+                <a href="download.html?id=ps2025" class="download-btn">下载</a>
+            </div>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Figma</span>
+                    <span class="desc">在线 UI/UX 协作设计</span>
+                </div>
+                <a href="download.html?id=figma" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- 设计工具内容结束 -->
+
+        <!-- 开发工具 -->
+        <div class="resource-section" id="section-dev">
+            <h2>💻 开发工具</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">VS Code</span>
+                    <span class="desc">轻量级代码编辑器</span>
+                </div>
+                <a href="download.html?id=vscode" class="download-btn">下载</a>
+            </div>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Git</span>
+                    <span class="desc">版本控制系统</span>
+                </div>
+                <a href="download.html?id=git" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- 开发工具内容结束 -->
+
+        <!-- 办公效率 -->
+        <div class="resource-section" id="section-office">
+            <h2>📄 办公效率</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Microsoft Office 2024</span>
+                    <span class="desc">Word, Excel, PowerPoint</span>
+                </div>
+                <a href="download.html?id=office2024" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- 办公效率内容结束 -->
+
+        <!-- 游戏资源 - Steam 工具 -->
+        <div class="resource-section" id="section-games-steam">
+            <h2>🛒 Steam 工具</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Steam++</span>
+                    <span class="desc">Steam 加速与辅助工具</span>
+                </div>
+                <a href="download.html?id=steampp" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- Steam 工具内容结束 -->
+
+        <!-- 游戏资源 - 模拟器 -->
+        <div class="resource-section" id="section-games-emu">
+            <h2>📟 模拟器</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">RetroArch</span>
+                    <span class="desc">多平台游戏模拟器前端</span>
+                </div>
+                <a href="download.html?id=retroarch" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- 模拟器内容结束 -->
+
+        <!-- 影音处理 -->
+        <div class="resource-section" id="section-media">
+            <h2>🎬 影音处理</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">Premiere Pro 2025</span>
+                    <span class="desc">专业视频剪辑</span>
+                </div>
+                <a href="download.html?id=pr2025" class="download-btn">下载</a>
+            </div>
+        </div>
+        <!-- 影音处理内容结束 -->
+
+        <!-- 其他资源 -->
+        <div class="resource-section" id="section-other">
+            <h2>📦 其他资源</h2>
+            <div class="resource-item">
+                <div class="info">
+                    <span class="name">7-Zip</span>
+                    <span class="desc">高压缩比压缩工具</span>
+                </div>
+                <a href="download.html?id=7zip" class="download-btn">下载</a>
+            </div>
+            <!-- 空状态提示：当该分类下暂无更多资源时显示 -->
+            <div class="empty-tip">💡 更多资源持续添加中...</div>
+        </div>
+        <!-- 其他资源内容结束 -->
+
+    </main>
+    <!-- ============================================================
+           主内容区 - 结束
+           ============================================================ -->
+
+    <!-- ============================================================
+           JavaScript：侧边栏交互逻辑
+           功能：
+           1. 点击父级按钮（parent-btn）展开/收起子菜单
+           2. 点击任何按钮（除父级按钮外）切换右侧内容
+           3. 页面加载后默认展开第一个可展开项（MC）
+           ============================================================ -->
+    <script>
+        // ============================================================
+        // 1. 处理可展开的父级按钮
+        //    点击父级按钮时，展开或收起对应的子菜单
+        // ============================================================
+
+        // 获取所有 class="parent-btn" 的按钮
+        const parentBtns = document.querySelectorAll('.parent-btn');
+        // parentBtns 是一个 NodeList（类似数组），包含所有父级按钮
+
+        // 遍历每一个父级按钮，为它绑定点击事件
+        parentBtns.forEach(btn => {
+            // forEach：遍历数组中的每个元素
+            // btn：当前遍历到的父级按钮
+
+            // 为当前按钮添加 click 事件监听
+            btn.addEventListener('click', function(e) {
+                // addEventListener：添加事件监听器
+                // 'click'：监听的是点击事件
+                // function(e)：点击时执行的函数，e 是事件对象
+
+                // e.stopPropagation()：阻止事件冒泡
+                // 防止点击父级按钮时，意外触发父级之外的其他点击事件
+                e.stopPropagation();
+
+                // 找到当前按钮所在的 <li> 元素
+                // this 指向当前被点击的按钮
+                // closest('li')：从当前元素向上查找最近的 <li> 祖先元素
+                const parentLi = this.closest('li');
+
+                // 在 <li> 中查找 class="sub-menu" 的子菜单
+                const subMenu = parentLi.querySelector('.sub-menu');
+
+                // 在当前按钮中查找 class="arrow" 的箭头元素
+                const arrow = this.querySelector('.arrow');
+
+                // 如果找到了子菜单
+                if (subMenu) {
+                    // toggle('open')：切换子菜单的 open 类
+                    // 如果子菜单有 open 类，则移除；如果没有，则添加
+                    // 配合 CSS 中的 .sub-menu.open { max-height: 400px; } 实现展开/收起
+                    subMenu.classList.toggle('open');
+
+                    // 如果找到了箭头元素
+                    if (arrow) {
+                        // 切换箭头的 open 类
+                        // 配合 CSS 中的 .arrow.open { transform: rotate(90deg); } 实现箭头旋转
+                        arrow.classList.toggle('open');
+                    }
+                }
+            });
+            // 点击事件绑定结束
+        });
+        // 父级按钮处理结束
+
+        // ============================================================
+        // 2. 处理所有内容切换按钮（不包括父级按钮）
+        //    点击按钮时：高亮当前按钮，显示对应的资源区块
+        // ============================================================
+
+        // 获取所有能切换内容的按钮
+        // ':not(.parent-btn)'：排除 class="parent-btn" 的按钮（父级按钮只负责展开/收起）
+        const contentButtons = document.querySelectorAll('.sidebar button:not(.parent-btn)');
+        // contentButtons 包含所有普通按钮和子菜单中的按钮
+
+        // 获取所有资源区块（class="resource-section" 的元素）
+        const sections = document.querySelectorAll('.resource-section');
+        // sections 包含所有内容区块
+
+        // 遍历每一个内容切换按钮，绑定点击事件
+        contentButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // ===== 第一步：移除所有按钮的 active 类 =====
+                // 获取侧边栏中的所有按钮（包括父级按钮和子级按钮）
+                document.querySelectorAll('.sidebar button').forEach(btn => {
+                    // 遍历每个按钮，移除 active 类
+                    btn.classList.remove('active');
+                });
+
+                // ===== 第二步：为当前点击的按钮添加 active 类 =====
+                // this 指向当前被点击的按钮
+                // classList.add('active')：添加 active 类，让按钮高亮
+                this.classList.add('active');
+
+                // ===== 第三步：获取当前按钮要显示的内容区块 id =====
+                // getAttribute('data-target')：获取按钮的 data-target 属性值
+                // 例如：data-target="section-design" → 得到 "section-design"
+                const targetId = this.getAttribute('data-target');
+
+                // ===== 第四步：隐藏所有资源区块 =====
+                sections.forEach(section => {
+                    // 遍历每个资源区块，移除 active 类（隐藏）
+                    section.classList.remove('active');
+                });
+
+                // ===== 第五步：显示对应的资源区块 =====
+                // document.getElementById(targetId)：通过 id 查找对应的元素
+                const targetSection = document.getElementById(targetId);
+
+                // 如果找到了对应的元素
+                if (targetSection) {
+                    // 为该元素添加 active 类（显示）
+                    targetSection.classList.add('active');
+                }
+            });
+            // 点击事件绑定结束
+        });
+        // 内容切换按钮处理结束
+
+        // ============================================================
+        // 3. 页面加载后，默认展开第一个可展开项（MC）
+        //    让用户一打开页面就能看到 MC 的子菜单
+        // ============================================================
+
+        // document.querySelector('.parent-btn')：获取第一个父级按钮
+        const firstParent = document.querySelector('.parent-btn');
+
+        // 如果找到了第一个父级按钮
+        if (firstParent) {
+            // 找到这个按钮所在的 <li>
+            const parentLi = firstParent.closest('li');
+
+            // 在 <li> 中查找子菜单
+            const subMenu = parentLi.querySelector('.sub-menu');
+
+            // 在按钮中查找箭头
+            const arrow = firstParent.querySelector('.arrow');
+
+            // 如果找到了子菜单
+            if (subMenu) {
+                // 添加 open 类，让子菜单默认展开
+                subMenu.classList.add('open');
+
+                // 如果找到了箭头
+                if (arrow) {
+                    // 添加 open 类，让箭头默认旋转（变成 ▼）
+                    arrow.classList.add('open');
+                }
+            }
+        }
+        // 默认展开第一个可展开项处理结束
+    </script>
+    <!-- JavaScript 部分结束 -->
+
+</body>
+<!-- body部分结束 -->
+
+</html>
+<!-- HTML文档结束 -->
