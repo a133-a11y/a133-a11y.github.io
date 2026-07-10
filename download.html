@@ -261,7 +261,8 @@
             `;
             downloadBtn.style.backgroundColor = '#999';
             downloadBtn.style.cursor = 'not-allowed';
-            downloadBtn.href = '#';
+            downloadBtn.href = `files/${resource.file}`;
+            //downloadBtn.href = '#';
             downloadBtn.textContent = '❌ 请选择资源';
         }
     </script>
