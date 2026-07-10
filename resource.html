@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 声明文档类型为HTML5，告诉浏览器按标准模式解析 -->
+<!-- 声明文档类型为HTML5，让浏览器按标准模式解析 -->
 <html>
 <!-- HTML文档开始 -->
 
@@ -15,12 +15,11 @@
     <style>
         /* ============================================================
                style标签：存放所有CSS样式代码，控制网页的外观
-               注释：以下所有样式都写在 style 标签内
+               以下所有样式都写在 style 标签内
                ============================================================ */
 
         /* ===== 全局重置 ===== */
         /* 作用：清除浏览器默认的边距和内边距，让所有元素的尺寸计算更一致 */
-
         * {
             margin: 0;
             /* 清除所有元素默认的外边距 */
@@ -156,7 +155,7 @@
 
         /* ============================================================
                可展开的父级按钮样式
-               父级按钮：点击后展开/收起子菜单（如“MC 我的世界”）
+               父级按钮：点击后展开/收起子菜单（如"MC 我的世界"）
                ============================================================ */
 
         .sidebar .parent-btn {
@@ -440,7 +439,8 @@
             /* 与名称保持2像素间距 */
         }
 
-        /* .resource-item .download-btn：下载按钮 */
+        /* ===== 下载按钮样式 ===== */
+        /* 直接下载按钮，不经过任何中间页面 */
         .resource-item .download-btn {
             background-color: #2c3e50;
             /* 背景：深灰蓝色 */
@@ -577,11 +577,11 @@
 
 <body>
     <!-- ============================================================
-           body部分：网页的“身体”，所有可见内容都写在这里
+           body部分：网页的"身体"，所有可见内容都写在这里
            ============================================================ -->
 
     <!-- ============================================================
-           侧边栏（左侧导航区域） - 开始
+           侧边栏（左侧导航区域）- 开始
            ============================================================ -->
     <nav class="sidebar">
         <!-- nav标签：语义化标签，表示导航区域 -->
@@ -602,10 +602,8 @@
 
                 <!-- 父级按钮：点击后展开/收起子菜单 -->
                 <!-- class="parent-btn"：标识这是可展开的父级按钮 -->
-                <!-- data-target：自定义属性，用于标识这个按钮对应的内容区（此处暂未使用） -->
                 <button class="parent-btn" data-target="section-mc">
                     <!-- button标签：可点击的按钮 -->
-                    <!-- 按钮文字：图标 + 分类名称 -->
                     <span>⛏️ MC 我的世界</span>
                     <!-- span标签：包裹文字部分 -->
                     <span class="arrow">▶</span>
@@ -653,23 +651,23 @@
             <li><button data-target="section-office">📄 办公效率</button></li>
 
             <!-- ============================================================
-                 另一个可展开项示例：游戏资源
+                 另一个可展开项：游戏工具
                  ============================================================ -->
             <li>
                 <!-- 父级按钮 -->
                 <button class="parent-btn" data-target="section-games">
-                    <span>🎮 游戏资源</span>
+                    <span>🎮 游戏工具</span>
                     <span class="arrow">▶</span>
                 </button>
                 <!-- 子菜单 -->
                 <ul class="sub-menu">
-                    <li><button data-target="section-games-steam">🛒 Steam 工具</button></li>
-                    <li><button data-target="section-games-emu">📟 模拟器</button></li>
+                    <li><button data-target="section-games-trainer">🎯 修改器</button></li>
+                    <li><button data-target="section-games-helper">🆘 辅助工具</button></li>
                 </ul>
             </li>
-            <!-- 游戏资源可展开项结束 -->
+            <!-- 游戏工具可展开项结束 -->
 
-            <!-- 更多普通项 -->
+            <!-- ===== 更多普通项 ===== -->
             <li><button data-target="section-media">🎬 影音处理</button></li>
             <li><button data-target="section-other">📦 其他资源</button></li>
 
@@ -688,7 +686,7 @@
            ============================================================ -->
 
     <!-- ============================================================
-           主内容区（右侧内容区域） - 开始
+           主内容区（右侧内容区域）- 开始
            ============================================================ -->
     <main class="main-content">
         <!-- main标签：语义化标签，表示主要内容区域 -->
@@ -696,7 +694,7 @@
         <h1>📦 资源中心</h1>
         <!-- 页面主标题 -->
 
-        <p class="subtitle">选择左侧领域，浏览相关资源 — 点击「下载」进入下载页</p>
+        <p class="subtitle">选择左侧领域，浏览相关资源 — 点击「下载」直接获取文件</p>
         <!-- 页面副标题/引导文字 -->
 
         <!-- ============================================================
@@ -718,11 +716,12 @@
                 <div class="info">
                     <span class="name">HMCL</span>
                     <!-- 资源名称 -->
-                    <span class="desc"> Minecraft 启动器，支持多版本</span>
+                    <span class="desc">开源 Minecraft 启动器，支持多版本</span>
                     <!-- 资源描述 -->
                 </div>
-                <!-- 下载按钮：点击跳转到 download.html，通过 ?id=hmcl 传递资源标识 -->
-                <a href="download.html?id=hmcl" class="download-btn">下载</a>
+                <!-- 下载按钮：直接指向 files/ 文件夹里的文件 -->
+                <!-- download 属性：告诉浏览器下载这个文件，而不是在浏览器中打开 -->
+                <a href="files/HMCL.exe" class="download-btn" download>下载</a>
             </div>
 
             <!-- 资源项2：PCL2 -->
@@ -731,7 +730,8 @@
                     <span class="name">PCL2</span>
                     <span class="desc">Plain Craft Launcher 2，国内常用启动器</span>
                 </div>
-               <a href="files/PCL2.exe" class="download-btn" download>下载</a>
+                <!-- 注意：文件名必须和 files/ 文件夹里的文件名完全一致 -->
+                <a href="files/PCL2.exe" class="download-btn" download>下载</a>
             </div>
 
             <!-- 资源项3：BakaXL -->
@@ -740,7 +740,7 @@
                     <span class="name">BakaXL</span>
                     <span class="desc">界面美观的 MC 启动器</span>
                 </div>
-                <a href="download.html?id=bakaxl" class="download-btn">下载</a>
+                <a href="files/BakaXL.exe" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- MC - 启动器内容结束 -->
@@ -753,14 +753,14 @@
                     <span class="name">OptiFine</span>
                     <span class="desc">优化性能，支持光影</span>
                 </div>
-                <a href="download.html?id=optifine" class="download-btn">下载</a>
+                <a href="files/OptiFine.jar" class="download-btn" download>下载</a>
             </div>
             <div class="resource-item">
                 <div class="info">
                     <span class="name">Forge</span>
                     <span class="desc">模组加载器（API）</span>
                 </div>
-                <a href="download.html?id=forge" class="download-btn">下载</a>
+                <a href="files/forge-installer.jar" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- MC - 模组内容结束 -->
@@ -773,7 +773,7 @@
                     <span class="name">Faithful</span>
                     <span class="desc">经典高清原版风格材质包</span>
                 </div>
-                <a href="download.html?id=faithful" class="download-btn">下载</a>
+                <a href="files/Faithful.zip" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- MC - 材质包内容结束 -->
@@ -786,7 +786,7 @@
                     <span class="name">Paper</span>
                     <span class="desc">高性能 Spigot 分支服务端</span>
                 </div>
-                <a href="download.html?id=paper" class="download-btn">下载</a>
+                <a href="files/paper-server.jar" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- MC - 服务端内容结束 -->
@@ -796,7 +796,7 @@
              ============================================================ -->
 
         <!-- 设计工具（默认激活显示） -->
-        <!-- class="active"：这个区块默认显示，因为侧边栏的“设计工具”按钮默认也是 active -->
+        <!-- class="active"：这个区块默认显示，因为侧边栏的"设计工具"按钮默认也是 active -->
         <div class="resource-section active" id="section-design">
             <h2>🎨 设计工具</h2>
             <div class="resource-item">
@@ -804,14 +804,14 @@
                     <span class="name">Photoshop 2025</span>
                     <span class="desc">专业图像编辑软件</span>
                 </div>
-                <a href="download.html?id=ps2025" class="download-btn">下载</a>
+                <a href="files/Photoshop_2025.exe" class="download-btn" download>下载</a>
             </div>
             <div class="resource-item">
                 <div class="info">
                     <span class="name">Figma</span>
                     <span class="desc">在线 UI/UX 协作设计</span>
                 </div>
-                <a href="download.html?id=figma" class="download-btn">下载</a>
+                <a href="files/Figma.zip" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- 设计工具内容结束 -->
@@ -824,14 +824,14 @@
                     <span class="name">VS Code</span>
                     <span class="desc">轻量级代码编辑器</span>
                 </div>
-                <a href="download.html?id=vscode" class="download-btn">下载</a>
+                <a href="files/VSCode.exe" class="download-btn" download>下载</a>
             </div>
             <div class="resource-item">
                 <div class="info">
                     <span class="name">Git</span>
                     <span class="desc">版本控制系统</span>
                 </div>
-                <a href="download.html?id=git" class="download-btn">下载</a>
+                <a href="files/Git.exe" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- 开发工具内容结束 -->
@@ -844,36 +844,36 @@
                     <span class="name">Microsoft Office 2024</span>
                     <span class="desc">Word, Excel, PowerPoint</span>
                 </div>
-                <a href="download.html?id=office2024" class="download-btn">下载</a>
+                <a href="files/Office_2024.exe" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- 办公效率内容结束 -->
 
-        <!-- 游戏资源 - Steam 工具 -->
-        <div class="resource-section" id="section-games-steam">
-            <h2>🛒 Steam 工具</h2>
+        <!-- 游戏工具 - 修改器 -->
+        <div class="resource-section" id="section-games-trainer">
+            <h2>🎯 修改器</h2>
             <div class="resource-item">
                 <div class="info">
-                    <span class="name">Steam++</span>
-                    <span class="desc">Steam 加速与辅助工具</span>
+                    <span class="name">风灵月影</span>
+                    <span class="desc">单机游戏修改器合集</span>
                 </div>
-                <a href="download.html?id=steampp" class="download-btn">下载</a>
+                <a href="files/Fengling.exe" class="download-btn" download>下载</a>
             </div>
         </div>
-        <!-- Steam 工具内容结束 -->
+        <!-- 修改器内容结束 -->
 
-        <!-- 游戏资源 - 模拟器 -->
-        <div class="resource-section" id="section-games-emu">
-            <h2>📟 模拟器</h2>
+        <!-- 游戏工具 - 辅助工具 -->
+        <div class="resource-section" id="section-games-helper">
+            <h2>🆘 辅助工具</h2>
             <div class="resource-item">
                 <div class="info">
-                    <span class="name">RetroArch</span>
-                    <span class="desc">多平台游戏模拟器前端</span>
+                    <span class="name">WeMod</span>
+                    <span class="desc">多平台游戏辅助工具</span>
                 </div>
-                <a href="download.html?id=retroarch" class="download-btn">下载</a>
+                <a href="files/WeMod.exe" class="download-btn" download>下载</a>
             </div>
         </div>
-        <!-- 模拟器内容结束 -->
+        <!-- 辅助工具内容结束 -->
 
         <!-- 影音处理 -->
         <div class="resource-section" id="section-media">
@@ -883,7 +883,7 @@
                     <span class="name">Premiere Pro 2025</span>
                     <span class="desc">专业视频剪辑</span>
                 </div>
-                <a href="download.html?id=pr2025" class="download-btn">下载</a>
+                <a href="files/Premiere_2025.exe" class="download-btn" download>下载</a>
             </div>
         </div>
         <!-- 影音处理内容结束 -->
@@ -896,9 +896,9 @@
                     <span class="name">7-Zip</span>
                     <span class="desc">高压缩比压缩工具</span>
                 </div>
-                <a href="download.html?id=7zip" class="download-btn">下载</a>
+                <a href="files/7-Zip.exe" class="download-btn" download>下载</a>
             </div>
-            <!-- 空状态提示：当该分类下暂无更多资源时显示 -->
+            <!-- 空状态提示 -->
             <div class="empty-tip">💡 更多资源持续添加中...</div>
         </div>
         <!-- 其他资源内容结束 -->
@@ -923,139 +923,81 @@
 
         // 获取所有 class="parent-btn" 的按钮
         const parentBtns = document.querySelectorAll('.parent-btn');
-        // parentBtns 是一个 NodeList（类似数组），包含所有父级按钮
 
         // 遍历每一个父级按钮，为它绑定点击事件
         parentBtns.forEach(btn => {
-            // forEach：遍历数组中的每个元素
-            // btn：当前遍历到的父级按钮
-
-            // 为当前按钮添加 click 事件监听
             btn.addEventListener('click', function(e) {
-                // addEventListener：添加事件监听器
-                // 'click'：监听的是点击事件
-                // function(e)：点击时执行的函数，e 是事件对象
-
-                // e.stopPropagation()：阻止事件冒泡
-                // 防止点击父级按钮时，意外触发父级之外的其他点击事件
+                // 阻止事件冒泡，防止触发父级之外的其他点击事件
                 e.stopPropagation();
 
                 // 找到当前按钮所在的 <li> 元素
-                // this 指向当前被点击的按钮
-                // closest('li')：从当前元素向上查找最近的 <li> 祖先元素
                 const parentLi = this.closest('li');
-
                 // 在 <li> 中查找 class="sub-menu" 的子菜单
                 const subMenu = parentLi.querySelector('.sub-menu');
-
                 // 在当前按钮中查找 class="arrow" 的箭头元素
                 const arrow = this.querySelector('.arrow');
 
-                // 如果找到了子菜单
                 if (subMenu) {
-                    // toggle('open')：切换子菜单的 open 类
-                    // 如果子菜单有 open 类，则移除；如果没有，则添加
-                    // 配合 CSS 中的 .sub-menu.open { max-height: 400px; } 实现展开/收起
+                    // 切换子菜单的展开/收起
                     subMenu.classList.toggle('open');
-
-                    // 如果找到了箭头元素
                     if (arrow) {
-                        // 切换箭头的 open 类
-                        // 配合 CSS 中的 .arrow.open { transform: rotate(90deg); } 实现箭头旋转
+                        // 切换箭头的旋转状态
                         arrow.classList.toggle('open');
                     }
                 }
             });
-            // 点击事件绑定结束
         });
-        // 父级按钮处理结束
 
         // ============================================================
         // 2. 处理所有内容切换按钮（不包括父级按钮）
         //    点击按钮时：高亮当前按钮，显示对应的资源区块
         // ============================================================
 
-        // 获取所有能切换内容的按钮
-        // ':not(.parent-btn)'：排除 class="parent-btn" 的按钮（父级按钮只负责展开/收起）
+        // 获取所有能切换内容的按钮（排除父级按钮）
         const contentButtons = document.querySelectorAll('.sidebar button:not(.parent-btn)');
-        // contentButtons 包含所有普通按钮和子菜单中的按钮
-
-        // 获取所有资源区块（class="resource-section" 的元素）
+        // 获取所有资源区块
         const sections = document.querySelectorAll('.resource-section');
-        // sections 包含所有内容区块
 
-        // 遍历每一个内容切换按钮，绑定点击事件
         contentButtons.forEach(button => {
             button.addEventListener('click', function() {
-                // ===== 第一步：移除所有按钮的 active 类 =====
-                // 获取侧边栏中的所有按钮（包括父级按钮和子级按钮）
+                // 移除所有按钮的 active 类
                 document.querySelectorAll('.sidebar button').forEach(btn => {
-                    // 遍历每个按钮，移除 active 类
                     btn.classList.remove('active');
                 });
-
-                // ===== 第二步：为当前点击的按钮添加 active 类 =====
-                // this 指向当前被点击的按钮
-                // classList.add('active')：添加 active 类，让按钮高亮
+                // 为当前点击的按钮添加 active 类
                 this.classList.add('active');
 
-                // ===== 第三步：获取当前按钮要显示的内容区块 id =====
-                // getAttribute('data-target')：获取按钮的 data-target 属性值
-                // 例如：data-target="section-design" → 得到 "section-design"
+                // 获取目标内容区的 id
                 const targetId = this.getAttribute('data-target');
 
-                // ===== 第四步：隐藏所有资源区块 =====
+                // 隐藏所有资源区块
                 sections.forEach(section => {
-                    // 遍历每个资源区块，移除 active 类（隐藏）
                     section.classList.remove('active');
                 });
 
-                // ===== 第五步：显示对应的资源区块 =====
-                // document.getElementById(targetId)：通过 id 查找对应的元素
+                // 显示对应的资源区块
                 const targetSection = document.getElementById(targetId);
-
-                // 如果找到了对应的元素
                 if (targetSection) {
-                    // 为该元素添加 active 类（显示）
                     targetSection.classList.add('active');
                 }
             });
-            // 点击事件绑定结束
         });
-        // 内容切换按钮处理结束
 
         // ============================================================
         // 3. 页面加载后，默认展开第一个可展开项（MC）
-        //    让用户一打开页面就能看到 MC 的子菜单
         // ============================================================
-
-        // document.querySelector('.parent-btn')：获取第一个父级按钮
         const firstParent = document.querySelector('.parent-btn');
-
-        // 如果找到了第一个父级按钮
         if (firstParent) {
-            // 找到这个按钮所在的 <li>
             const parentLi = firstParent.closest('li');
-
-            // 在 <li> 中查找子菜单
             const subMenu = parentLi.querySelector('.sub-menu');
-
-            // 在按钮中查找箭头
             const arrow = firstParent.querySelector('.arrow');
-
-            // 如果找到了子菜单
             if (subMenu) {
-                // 添加 open 类，让子菜单默认展开
                 subMenu.classList.add('open');
-
-                // 如果找到了箭头
                 if (arrow) {
-                    // 添加 open 类，让箭头默认旋转（变成 ▼）
                     arrow.classList.add('open');
                 }
             }
         }
-        // 默认展开第一个可展开项处理结束
     </script>
     <!-- JavaScript 部分结束 -->
 
