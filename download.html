@@ -1,271 +1,1525 @@
 <!DOCTYPE html>
+<!-- 声明文档类型为HTML5，告诉浏览器按标准模式解析 -->
 <html>
+<!-- HTML文档开始 -->
+
 <head>
-    <!-- 字符编码：让浏览器正确显示中文 -->
+    <!-- head部分：存放网页的元数据和样式，不会直接显示在页面上 -->
+
     <meta charset="utf-8">
-    <!-- 页面标题：显示在浏览器标签栏上 -->
+    <!-- 字符编码声明：告诉浏览器使用UTF-8编码，正确显示中文和特殊字符 -->
+
     <title>下载页 - 自制网</title>
+    <!-- 网页标题：显示在浏览器标签栏上 -->
+
     <style>
+        /* ============================================================
+                style标签：存放所有CSS样式代码，控制网页的外观
+                ============================================================ */
+
         /* ===== 全局重置：清除浏览器默认边距，让布局更可控 ===== */
         * {
             margin: 0;
+            /* 清除所有元素默认的外边距 */
             padding: 0;
+            /* 清除所有元素默认的内边距 */
             box-sizing: border-box;
+            /* 让边框和内边距算在元素总宽高内，方便布局 */
         }
 
         /* ===== body：页面主体样式 ===== */
         body {
-            background-color: #ADD8E6;      /* 浅蓝色背景，与全站统一 */
-            font-family: "微软雅黑", sans-serif; /* 字体优先使用微软雅黑 */
-            text-align: center;             /* 所有文字居中 */
-            padding: 60px 20px;             /* 上下60px，左右20px内边距 */
-            min-height: 100vh;              /* 至少占满浏览器可视高度 */
-            display: flex;                  /* 使用flex布局 */
-            flex-direction: column;         /* 纵向排列 */
-            justify-content: center;        /* 垂直居中 */
-            align-items: center;            /* 水平居中 */
+            background-color: #ADD8E6;
+            /* 背景颜色：浅蓝色，与全站统一 */
+            font-family: "微软雅黑", sans-serif;
+            /* 字体：优先使用微软雅黑，系统没有则回退到无衬线字体 */
+            text-align: center;
+            /* 所有文字居中排列 */
+            padding: 60px 20px;
+            /* 内边距：上下60px，左右20px，让内容不贴边 */
+            min-height: 100vh;
+            /* 最小高度：至少占满浏览器可视窗口的100% */
+            display: flex;
+            /* 使用flex弹性布局 */
+            flex-direction: column;
+            /* 让内部元素纵向排列（从上到下） */
+            justify-content: center;
+            /* 让内容在垂直方向上居中 */
+            align-items: center;
+            /* 让内容在水平方向上居中 */
         }
 
         /* ===== 主卡片：白色半透明背景，承载所有内容 ===== */
         .download-card {
-            background-color: rgba(255, 255, 255, 0.85); /* 半透明白色背景 */
-            border-radius: 24px;            /* 大圆角，更柔和 */
-            padding: 50px 60px;             /* 内边距：上下50px，左右60px */
-            max-width: 600px;               /* 最大宽度600px，防止太宽 */
-            width: 100%;                    /* 宽度自适应 */
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12); /* 阴影，增加立体感 */
+            background-color: rgba(255, 255, 255, 0.85);
+            /* 背景颜色：半透明白色（透明度85%） */
+            border-radius: 24px;
+            /* 边框圆角：24像素大圆角，更柔和 */
+            padding: 50px 60px;
+            /* 内边距：上下50px，左右60px */
+            max-width: 600px;
+            /* 最大宽度600px，防止在大屏上太宽 */
+            width: 100%;
+            /* 宽度自适应，占满父容器 */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            /* 阴影：垂直偏移8px，模糊30px，半透明黑色，增加立体感 */
         }
 
         /* ===== 标题样式 ===== */
         .download-card h1 {
-            color: #2c3e50;                 /* 深灰蓝色 */
-            font-size: 2.2em;               /* 字体大小 */
-            margin-bottom: 8px;             /* 与下方保持间距 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            font-size: 2.2em;
+            /* 字体大小：2.2倍于父元素 */
+            margin-bottom: 8px;
+            /* 下外边距8px，与下方保持间距 */
         }
 
         /* ===== 副标题/描述文字 ===== */
         .download-card .subtitle {
-            color: #555;                    /* 中灰色 */
-            font-size: 1em;                 /* 标准大小 */
-            margin-bottom: 30px;            /* 与下方保持间距 */
+            color: #555;
+            /* 文字颜色：中灰色 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方保持间距 */
         }
 
         /* ===== 资源信息区域 ===== */
         .resource-info {
-            background-color: #f0f4f8;      /* 浅灰蓝色背景 */
-            border-radius: 16px;            /* 圆角 */
-            padding: 25px 30px;             /* 内边距 */
-            margin-bottom: 30px;            /* 与下方按钮保持间距 */
-            text-align: left;               /* 文字左对齐，更易读 */
+            background-color: #f0f4f8;
+            /* 背景颜色：浅灰蓝色 */
+            border-radius: 16px;
+            /* 边框圆角：16像素 */
+            padding: 25px 30px;
+            /* 内边距：上下25px，左右30px */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方按钮保持间距 */
+            text-align: left;
+            /* 文字左对齐，更易读 */
         }
 
         /* ===== 资源名称（大号） ===== */
         .resource-info .name {
-            font-size: 1.6em;               /* 大号字体 */
-            font-weight: bold;              /* 加粗 */
-            color: #2c3e50;                 /* 深灰蓝色 */
+            font-size: 1.6em;
+            /* 字体大小：1.6倍于父元素，大号字体 */
+            font-weight: bold;
+            /* 字体加粗 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
         }
 
         /* ===== 资源描述 ===== */
         .resource-info .desc {
-            color: #555;                    /* 中灰色 */
-            margin-top: 6px;                /* 与上方保持间距 */
-            font-size: 1em;                 /* 标准大小 */
+            color: #555;
+            /* 文字颜色：中灰色 */
+            margin-top: 6px;
+            /* 上外边距6px，与上方保持间距 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
         }
 
-        /* ===== 资源ID（调试用，显示当前下载的是什么） ===== */
+        /* ===== 资源ID标签（显示当前下载的是什么） ===== */
         .resource-info .id-tag {
-            display: inline-block;          /* 行内块级元素 */
-            background-color: #2c3e50;      /* 深色背景 */
-            color: #87CEFA;                 /* 亮蓝色文字 */
-            padding: 4px 14px;              /* 内边距 */
-            border-radius: 20px;            /* 圆角标签 */
-            font-size: 0.8em;               /* 小号字体 */
-            margin-top: 10px;               /* 与上方保持间距 */
+            display: inline-block;
+            /* 行内块级元素：不换行，但可以设置宽高和内边距 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: #87CEFA;
+            /* 文字颜色：亮蓝色 */
+            padding: 4px 14px;
+            /* 内边距：上下4px，左右14px */
+            border-radius: 20px;
+            /* 边框圆角：20像素，胶囊形状 */
+            font-size: 0.8em;
+            /* 字体大小：稍微小一点 */
+            margin-top: 10px;
+            /* 上外边距10px，与上方保持间距 */
         }
 
-        /* ===== 下载按钮（主要操作） ===== */
+        /* ===== 下载按钮（主要操作按钮） ===== */
         .download-btn {
-            display: inline-block;          /* 行内块级元素 */
-            background-color: #2c3e50;      /* 深色背景 */
-            color: white;                   /* 白色文字 */
-            padding: 14px 50px;             /* 内边距：上下14px，左右50px */
-            border-radius: 50px;            /* 大圆角，变成胶囊按钮 */
-            text-decoration: none;          /* 去掉下划线 */
-            font-size: 1.2em;               /* 稍大字体 */
-            font-weight: bold;              /* 加粗 */
-            transition: background 0.3s;    /* 背景变色时平滑过渡 */
-            border: none;                   /* 无边框 */
-            cursor: pointer;                /* 鼠标悬停时显示手型 */
+            display: inline-block;
+            /* 行内块级元素 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: white;
+            /* 文字颜色：白色 */
+            padding: 14px 50px;
+            /* 内边距：上下14px，左右50px */
+            border-radius: 50px;
+            /* 边框圆角：50像素，完全胶囊形状 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            font-size: 1.2em;
+            /* 字体大小：稍微大一点 */
+            font-weight: bold;
+            /* 字体加粗 */
+            transition: background 0.3s;
+            /* 过渡动画：背景颜色变化时在0.3秒内平滑过渡 */
+            border: none;
+            /* 无边框 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针，表示可点击 */
         }
 
         /* ===== 下载按钮悬停效果 ===== */
         .download-btn:hover {
-            background-color: #1a2a3a;      /* 悬停时背景变深 */
+            background-color: #1a2a3a;
+            /* 悬停时背景颜色变深 */
         }
 
         /* ===== 返回首页的链接（次要操作） ===== */
         .back-link {
-            display: inline-block;          /* 行内块级元素 */
-            margin-top: 25px;               /* 与上方保持间距 */
-            color: #2c3e50;                 /* 深灰蓝色 */
-            text-decoration: none;          /* 去掉下划线 */
-            border: 1px solid #2c3e50;      /* 实线边框 */
-            padding: 8px 24px;              /* 内边距 */
-            border-radius: 30px;            /* 圆角 */
-            transition: background 0.3s, color 0.3s; /* 平滑过渡 */
+            display: inline-block;
+            /* 行内块级元素 */
+            margin-top: 25px;
+            /* 上外边距25px，与上方保持间距 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            border: 1px solid #2c3e50;
+            /* 边框：1像素实线，深灰蓝色 */
+            padding: 8px 24px;
+            /* 内边距：上下8px，左右24px */
+            border-radius: 30px;
+            /* 边框圆角：30像素 */
+            transition: background 0.3s, color 0.3s;
+            /* 过渡动画：背景和颜色变化时平滑过渡 */
         }
 
         /* ===== 返回链接悬停效果 ===== */
         .back-link:hover {
-            background-color: #2c3e50;      /* 悬停时背景变深 */
-            color: white;                   /* 悬停时文字变白 */
+            background-color: #2c3e50;
+            /* 悬停时背景变深 */
+            color: white;
+            /* 悬停时文字变白 */
         }
 
         /* ===== 错误提示（当资源不存在时显示） ===== */
         .error-msg {
-            color: #c0392b;                 /* 红色 */
-            padding: 20px;                  /* 内边距 */
-            font-size: 1.1em;               /* 稍大字体 */
+            color: #c0392b;
+            /* 文字颜色：红色，表示错误 */
+            padding: 20px;
+            /* 内边距20px */
+            font-size: 1.1em;
+            /* 字体大小：稍微大一点 */
+        }
+
+        /* ===== 下载按钮禁用状态 ===== */
+        .download-btn.disabled {
+            background-color: #999;
+            /* 背景颜色：灰色，表示不可用 */
+            cursor: not-allowed;
+            /* 鼠标悬停时显示禁止符号 */
+            opacity: 0.6;
+            /* 透明度60%，看起来更淡 */
         }
     </style>
+    <!-- 样式部分结束 -->
 </head>
+<!-- head部分结束 -->
+
 <body>
+    <!-- body部分：网页的“身体”，所有可见内容都写在这里 -->
 
     <!-- ===== 主卡片：所有内容都包在里面 ===== -->
     <div class="download-card">
         <!-- 标题 -->
         <h1>⬇️ 资源下载</h1>
-        <!-- 副标题 -->
+        <!-- 副标题/引导文字 -->
         <p class="subtitle">点击下方按钮即可开始下载</p>
 
         <!-- ===== 资源信息区域（由 JavaScript 动态填充） ===== -->
+        <!-- id="info-area"：JavaScript会往这个容器里插入内容 -->
         <div class="resource-info" id="info-area">
-            <!-- 这里的内容会由 JavaScript 根据 URL 参数动态生成 -->
+            <!-- 这里的文字是占位符，页面加载后会被JavaScript替换 -->
             <p>加载资源信息...</p>
         </div>
 
-        <!-- ===== 下载按钮（点击后触发下载） ===== -->
+        <!-- ===== 下载按钮 ===== -->
+        <!-- id="downloadBtn"：JavaScript通过这个id控制按钮的行为 -->
+        <!-- href="#"：临时占位，JavaScript会动态替换成正确的下载链接 -->
         <a href="#" class="download-btn" id="downloadBtn">⬇️ 立即下载</a>
 
         <!-- ===== 返回首页的链接 ===== -->
+        <!-- href="index.html"：点击后跳转到首页 -->
         <a href="index.html" class="back-link">← 返回首页</a>
     </div>
+    <!-- 主卡片结束 -->
 
+    <!-- ============================================================
+           JavaScript部分：页面交互逻辑
+           功能：
+           1. 从URL获取 ?id=xxx 参数
+           2. 根据id查找对应的资源
+           3. 显示资源信息，并设置正确的下载链接
+           ============================================================ -->
     <script>
         // ============================================================
         // 1. 资源数据库：所有可下载资源的清单
-        //    以后要增加新资源，就在这里添加一个新对象
         //    格式：{ id, name, desc, file }
         //    - id：唯一标识（必须和 resource.html 里的 ?id=xxx 一致）
         //    - name：资源名称（显示在页面上）
         //    - desc：资源描述（显示在页面上）
         //    - file：文件名（必须放在仓库的 files/ 文件夹里）
+        //    注意：以后要增加新资源，就在这里添加一个新对象
         // ============================================================
         const resources = [
             // ---- MC 启动器 ----
-            { id: 'hmcl', name: 'HMCL 启动器', desc: '开源 Minecraft 启动器，支持多版本管理', file: 'HMCL.exe' },
-            { id: 'pcl2', name: 'PCL2 启动器', desc: 'Plain Craft Launcher 2，国内最常用启动器', file: 'Plain Craft Launcher 2.exe' },
-            { id: 'bakaxl', name: 'BakaXL 启动器', desc: '界面美观的 Minecraft 启动器', file: 'BakaXL.exe' },
+            {
+                id: 'hmcl',
+                name: 'HMCL 启动器',
+                desc: '开源 Minecraft 启动器，支持多版本管理',
+                file: 'HMCL.exe'
+            },
+            {
+                id: 'pcl2',
+                name: 'PCL2 启动器',
+                desc: 'Plain Craft Launcher 2，国内最常用启动器',
+                file: 'Plain Craft Launcher 2.exe'
+<!-- 声明文档类型为HTML5，告诉浏览器按标准模式解析 -->
+<html>
+<!-- HTML文档开始 -->
+
+<head>
+    <!-- head部分：存放网页的元数据和样式，不会直接显示在页面上 -->
+
+    <meta charset="utf-8">
+    <!-- 字符编码声明：告诉浏览器使用UTF-8编码，正确显示中文和特殊字符 -->
+
+    <title>下载页 - 自制网</title>
+    <!-- 网页标题：显示在浏览器标签栏上 -->
+
+    <style>
+        /* ============================================================
+                style标签：存放所有CSS样式代码，控制网页的外观
+                ============================================================ */
+
+        /* ===== 全局重置：清除浏览器默认边距，让布局更可控 ===== */
+        * {
+            margin: 0;
+            /* 清除所有元素默认的外边距 */
+            padding: 0;
+            /* 清除所有元素默认的内边距 */
+            box-sizing: border-box;
+            /* 让边框和内边距算在元素总宽高内，方便布局 */
+        }
+
+        /* ===== body：页面主体样式 ===== */
+        body {
+            background-color: #ADD8E6;
+            /* 背景颜色：浅蓝色，与全站统一 */
+            font-family: "微软雅黑", sans-serif;
+            /* 字体：优先使用微软雅黑，系统没有则回退到无衬线字体 */
+            text-align: center;
+            /* 所有文字居中排列 */
+            padding: 60px 20px;
+            /* 内边距：上下60px，左右20px，让内容不贴边 */
+            min-height: 100vh;
+            /* 最小高度：至少占满浏览器可视窗口的100% */
+            display: flex;
+            /* 使用flex弹性布局 */
+            flex-direction: column;
+            /* 让内部元素纵向排列（从上到下） */
+            justify-content: center;
+            /* 让内容在垂直方向上居中 */
+            align-items: center;
+            /* 让内容在水平方向上居中 */
+        }
+
+        /* ===== 主卡片：白色半透明背景，承载所有内容 ===== */
+        .download-card {
+            background-color: rgba(255, 255, 255, 0.85);
+            /* 背景颜色：半透明白色（透明度85%） */
+            border-radius: 24px;
+            /* 边框圆角：24像素大圆角，更柔和 */
+            padding: 50px 60px;
+            /* 内边距：上下50px，左右60px */
+            max-width: 600px;
+            /* 最大宽度600px，防止在大屏上太宽 */
+            width: 100%;
+            /* 宽度自适应，占满父容器 */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            /* 阴影：垂直偏移8px，模糊30px，半透明黑色，增加立体感 */
+        }
+
+        /* ===== 标题样式 ===== */
+        .download-card h1 {
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            font-size: 2.2em;
+            /* 字体大小：2.2倍于父元素 */
+            margin-bottom: 8px;
+            /* 下外边距8px，与下方保持间距 */
+        }
+
+        /* ===== 副标题/描述文字 ===== */
+        .download-card .subtitle {
+            color: #555;
+            /* 文字颜色：中灰色 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方保持间距 */
+        }
+
+        /* ===== 资源信息区域 ===== */
+        .resource-info {
+            background-color: #f0f4f8;
+            /* 背景颜色：浅灰蓝色 */
+            border-radius: 16px;
+            /* 边框圆角：16像素 */
+            padding: 25px 30px;
+            /* 内边距：上下25px，左右30px */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方按钮保持间距 */
+            text-align: left;
+            /* 文字左对齐，更易读 */
+        }
+
+        /* ===== 资源名称（大号） ===== */
+        .resource-info .name {
+            font-size: 1.6em;
+            /* 字体大小：1.6倍于父元素，大号字体 */
+            font-weight: bold;
+            /* 字体加粗 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+        }
+
+        /* ===== 资源描述 ===== */
+        .resource-info .desc {
+            color: #555;
+            /* 文字颜色：中灰色 */
+            margin-top: 6px;
+            /* 上外边距6px，与上方保持间距 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
+        }
+
+        /* ===== 资源ID标签（显示当前下载的是什么） ===== */
+        .resource-info .id-tag {
+            display: inline-block;
+            /* 行内块级元素：不换行，但可以设置宽高和内边距 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: #87CEFA;
+            /* 文字颜色：亮蓝色 */
+            padding: 4px 14px;
+            /* 内边距：上下4px，左右14px */
+            border-radius: 20px;
+            /* 边框圆角：20像素，胶囊形状 */
+            font-size: 0.8em;
+            /* 字体大小：稍微小一点 */
+            margin-top: 10px;
+            /* 上外边距10px，与上方保持间距 */
+        }
+
+        /* ===== 下载按钮（主要操作按钮） ===== */
+        .download-btn {
+            display: inline-block;
+            /* 行内块级元素 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: white;
+            /* 文字颜色：白色 */
+            padding: 14px 50px;
+            /* 内边距：上下14px，左右50px */
+            border-radius: 50px;
+            /* 边框圆角：50像素，完全胶囊形状 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            font-size: 1.2em;
+            /* 字体大小：稍微大一点 */
+            font-weight: bold;
+            /* 字体加粗 */
+            transition: background 0.3s;
+            /* 过渡动画：背景颜色变化时在0.3秒内平滑过渡 */
+            border: none;
+            /* 无边框 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针，表示可点击 */
+        }
+
+        /* ===== 下载按钮悬停效果 ===== */
+        .download-btn:hover {
+            background-color: #1a2a3a;
+            /* 悬停时背景颜色变深 */
+        }
+
+        /* ===== 返回首页的链接（次要操作） ===== */
+        .back-link {
+            display: inline-block;
+            /* 行内块级元素 */
+            margin-top: 25px;
+            /* 上外边距25px，与上方保持间距 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            border: 1px solid #2c3e50;
+            /* 边框：1像素实线，深灰蓝色 */
+            padding: 8px 24px;
+            /* 内边距：上下8px，左右24px */
+            border-radius: 30px;
+            /* 边框圆角：30像素 */
+            transition: background 0.3s, color 0.3s;
+            /* 过渡动画：背景和颜色变化时平滑过渡 */
+        }
+
+        /* ===== 返回链接悬停效果 ===== */
+        .back-link:hover {
+            background-color: #2c3e50;
+            /* 悬停时背景变深 */
+            color: white;
+            /* 悬停时文字变白 */
+        }
+
+        /* ===== 错误提示（当资源不存在时显示） ===== */
+        .error-msg {
+            color: #c0392b;
+            /* 文字颜色：红色，表示错误 */
+            padding: 20px;
+            /* 内边距20px */
+            font-size: 1.1em;
+            /* 字体大小：稍微大一点 */
+        }
+
+        /* ===== 下载按钮禁用状态 ===== */
+        .download-btn.disabled {
+            background-color: #999;
+            /* 背景颜色：灰色，表示不可用 */
+            cursor: not-allowed;
+            /* 鼠标悬停时显示禁止符号 */
+            opacity: 0.6;
+            /* 透明度60%，看起来更淡 */
+        }
+    </style>
+    <!-- 样式部分结束 -->
+</head>
+<!-- head部分结束 -->
+
+<body>
+    <!-- body部分：网页的“身体”，所有可见内容都写在这里 -->
+
+    <!-- ===== 主卡片：所有内容都包在里面 ===== -->
+    <div class="download-card">
+        <!-- 标题 -->
+        <h1>⬇️ 资源下载</h1>
+        <!-- 副标题/引导文字 -->
+        <p class="subtitle">点击下方按钮即可开始下载</p>
+
+        <!-- ===== 资源信息区域（由 JavaScript 动态填充） ===== -->
+        <!-- id="info-area"：JavaScript会往这个容器里插入内容 -->
+        <div class="resource-info" id="info-area">
+            <!-- 这里的文字是占位符，页面加载后会被JavaScript替换 -->
+            <p>加载资源信息...</p>
+        </div>
+
+        <!-- ===== 下载按钮 ===== -->
+        <!-- id="downloadBtn"：JavaScript通过这个id控制按钮的行为 -->
+        <!-- href="#"：临时占位，JavaScript会动态替换成正确的下载链接 -->
+        <a href="#" class="download-btn" id="downloadBtn">⬇️ 立即下载</a>
+
+        <!-- ===== 返回首页的链接 ===== -->
+        <!-- href="index.html"：点击后跳转到首页 -->
+        <a href="index.html" class="back-link">← 返回首页</a>
+    </div>
+    <!-- 主卡片结束 -->
+
+    <!-- ============================================================
+           JavaScript部分：页面交互逻辑
+           功能：
+           1. 从URL获取 ?id=xxx 参数
+           2. 根据id查找对应的资源
+           3. 显示资源信息，并设置正确的下载链接
+           ============================================================ -->
+    <script>
+        // ============================================================
+        // 1. 资源数据库：所有可下载资源的清单
+        //    格式：{ id, name, desc, file }
+        //    - id：唯一标识（必须和 resource.html 里的 ?id=xxx 一致）
+        //    - name：资源名称（显示在页面上）
+        //    - desc：资源描述（显示在页面上）
+        //    - file：文件名（必须放在仓库的 files/ 文件夹里）
+        //    注意：以后要增加新资源，就在这里添加一个新对象
+        // ============================================================
+        const resources = [
+            // ---- MC 启动器 ----
+            {
+                id: 'hmcl',
+                name: 'HMCL 启动器',
+                desc: '开源 Minecraft 启动器，支持多版本管理',
+                file: 'HMCL.exe'
+            },
+            {
+                id: 'pcl2',
+                name: 'PCL2 启动器',
+                desc: 'Plain Craft Launcher 2，国内最常用启动器',
+                file: 'Plain Craft Launcher 2.exe'
+<!-- 声明文档类型为HTML5，告诉浏览器按标准模式解析 -->
+<html>
+<!-- HTML文档开始 -->
+
+<head>
+    <!-- head部分：存放网页的元数据和样式，不会直接显示在页面上 -->
+
+    <meta charset="utf-8">
+    <!-- 字符编码声明：告诉浏览器使用UTF-8编码，正确显示中文和特殊字符 -->
+
+    <title>下载页 - 自制网</title>
+    <!-- 网页标题：显示在浏览器标签栏上 -->
+
+    <style>
+        /* ============================================================
+                style标签：存放所有CSS样式代码，控制网页的外观
+                ============================================================ */
+
+        /* ===== 全局重置：清除浏览器默认边距，让布局更可控 ===== */
+        * {
+            margin: 0;
+            /* 清除所有元素默认的外边距 */
+            padding: 0;
+            /* 清除所有元素默认的内边距 */
+            box-sizing: border-box;
+            /* 让边框和内边距算在元素总宽高内，方便布局 */
+        }
+
+        /* ===== body：页面主体样式 ===== */
+        body {
+            background-color: #ADD8E6;
+            /* 背景颜色：浅蓝色，与全站统一 */
+            font-family: "微软雅黑", sans-serif;
+            /* 字体：优先使用微软雅黑，系统没有则回退到无衬线字体 */
+            text-align: center;
+            /* 所有文字居中排列 */
+            padding: 60px 20px;
+            /* 内边距：上下60px，左右20px，让内容不贴边 */
+            min-height: 100vh;
+            /* 最小高度：至少占满浏览器可视窗口的100% */
+            display: flex;
+            /* 使用flex弹性布局 */
+            flex-direction: column;
+            /* 让内部元素纵向排列（从上到下） */
+            justify-content: center;
+            /* 让内容在垂直方向上居中 */
+            align-items: center;
+            /* 让内容在水平方向上居中 */
+        }
+
+        /* ===== 主卡片：白色半透明背景，承载所有内容 ===== */
+        .download-card {
+            background-color: rgba(255, 255, 255, 0.85);
+            /* 背景颜色：半透明白色（透明度85%） */
+            border-radius: 24px;
+            /* 边框圆角：24像素大圆角，更柔和 */
+            padding: 50px 60px;
+            /* 内边距：上下50px，左右60px */
+            max-width: 600px;
+            /* 最大宽度600px，防止在大屏上太宽 */
+            width: 100%;
+            /* 宽度自适应，占满父容器 */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            /* 阴影：垂直偏移8px，模糊30px，半透明黑色，增加立体感 */
+        }
+
+        /* ===== 标题样式 ===== */
+        .download-card h1 {
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            font-size: 2.2em;
+            /* 字体大小：2.2倍于父元素 */
+            margin-bottom: 8px;
+            /* 下外边距8px，与下方保持间距 */
+        }
+
+        /* ===== 副标题/描述文字 ===== */
+        .download-card .subtitle {
+            color: #555;
+            /* 文字颜色：中灰色 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方保持间距 */
+        }
+
+        /* ===== 资源信息区域 ===== */
+        .resource-info {
+            background-color: #f0f4f8;
+            /* 背景颜色：浅灰蓝色 */
+            border-radius: 16px;
+            /* 边框圆角：16像素 */
+            padding: 25px 30px;
+            /* 内边距：上下25px，左右30px */
+            margin-bottom: 30px;
+            /* 下外边距30px，与下方按钮保持间距 */
+            text-align: left;
+            /* 文字左对齐，更易读 */
+        }
+
+        /* ===== 资源名称（大号） ===== */
+        .resource-info .name {
+            font-size: 1.6em;
+            /* 字体大小：1.6倍于父元素，大号字体 */
+            font-weight: bold;
+            /* 字体加粗 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+        }
+
+        /* ===== 资源描述 ===== */
+        .resource-info .desc {
+            color: #555;
+            /* 文字颜色：中灰色 */
+            margin-top: 6px;
+            /* 上外边距6px，与上方保持间距 */
+            font-size: 1em;
+            /* 字体大小：标准大小 */
+        }
+
+        /* ===== 资源ID标签（显示当前下载的是什么） ===== */
+        .resource-info .id-tag {
+            display: inline-block;
+            /* 行内块级元素：不换行，但可以设置宽高和内边距 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: #87CEFA;
+            /* 文字颜色：亮蓝色 */
+            padding: 4px 14px;
+            /* 内边距：上下4px，左右14px */
+            border-radius: 20px;
+            /* 边框圆角：20像素，胶囊形状 */
+            font-size: 0.8em;
+            /* 字体大小：稍微小一点 */
+            margin-top: 10px;
+            /* 上外边距10px，与上方保持间距 */
+        }
+
+        /* ===== 下载按钮（主要操作按钮） ===== */
+        .download-btn {
+            display: inline-block;
+            /* 行内块级元素 */
+            background-color: #2c3e50;
+            /* 背景颜色：深灰蓝色 */
+            color: white;
+            /* 文字颜色：白色 */
+            padding: 14px 50px;
+            /* 内边距：上下14px，左右50px */
+            border-radius: 50px;
+            /* 边框圆角：50像素，完全胶囊形状 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            font-size: 1.2em;
+            /* 字体大小：稍微大一点 */
+            font-weight: bold;
+            /* 字体加粗 */
+            transition: background 0.3s;
+            /* 过渡动画：背景颜色变化时在0.3秒内平滑过渡 */
+            border: none;
+            /* 无边框 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型指针，表示可点击 */
+        }
+
+        /* ===== 下载按钮悬停效果 ===== */
+        .download-btn:hover {
+            background-color: #1a2a3a;
+            /* 悬停时背景颜色变深 */
+        }
+
+        /* ===== 返回首页的链接（次要操作） ===== */
+        .back-link {
+            display: inline-block;
+            /* 行内块级元素 */
+            margin-top: 25px;
+            /* 上外边距25px，与上方保持间距 */
+            color: #2c3e50;
+            /* 文字颜色：深灰蓝色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            border: 1px solid #2c3e50;
+            /* 边框：1像素实线，深灰蓝色 */
+            padding: 8px 24px;
+            /* 内边距：上下8px，左右24px */
+            border-radius: 30px;
+            /* 边框圆角：30像素 */
+            transition: background 0.3s, color 0.3s;
+            /* 过渡动画：背景和颜色变化时平滑过渡 */
+        }
+
+        /* ===== 返回链接悬停效果 ===== */
+        .back-link:hover {
+            background-color: #2c3e50;
+            /* 悬停时背景变深 */
+            color: white;
+            /* 悬停时文字变白 */
+        }
+
+        /* ===== 错误提示（当资源不存在时显示） ===== */
+        .error-msg {
+            color: #c0392b;
+            /* 文字颜色：红色，表示错误 */
+            padding: 20px;
+            /* 内边距20px */
+            font-size: 1.1em;
+            /* 字体大小：稍微大一点 */
+        }
+
+        /* ===== 下载按钮禁用状态 ===== */
+        .download-btn.disabled {
+            background-color: #999;
+            /* 背景颜色：灰色，表示不可用 */
+            cursor: not-allowed;
+            /* 鼠标悬停时显示禁止符号 */
+            opacity: 0.6;
+            /* 透明度60%，看起来更淡 */
+        }
+    </style>
+    <!-- 样式部分结束 -->
+</head>
+<!-- head部分结束 -->
+
+<body>
+    <!-- body部分：网页的“身体”，所有可见内容都写在这里 -->
+
+    <!-- ===== 主卡片：所有内容都包在里面 ===== -->
+    <div class="download-card">
+        <!-- 标题 -->
+        <h1>⬇️ 资源下载</h1>
+        <!-- 副标题/引导文字 -->
+        <p class="subtitle">点击下方按钮即可开始下载</p>
+
+        <!-- ===== 资源信息区域（由 JavaScript 动态填充） ===== -->
+        <!-- id="info-area"：JavaScript会往这个容器里插入内容 -->
+        <div class="resource-info" id="info-area">
+            <!-- 这里的文字是占位符，页面加载后会被JavaScript替换 -->
+            <p>加载资源信息...</p>
+        </div>
+
+        <!-- ===== 下载按钮 ===== -->
+        <!-- id="downloadBtn"：JavaScript通过这个id控制按钮的行为 -->
+        <!-- href="#"：临时占位，JavaScript会动态替换成正确的下载链接 -->
+        <a href="#" class="download-btn" id="downloadBtn">⬇️ 立即下载</a>
+
+        <!-- ===== 返回首页的链接 ===== -->
+        <!-- href="index.html"：点击后跳转到首页 -->
+        <a href="index.html" class="back-link">← 返回首页</a>
+    </div>
+    <!-- 主卡片结束 -->
+
+    <!-- ============================================================
+           JavaScript部分：页面交互逻辑
+           功能：
+           1. 从URL获取 ?id=xxx 参数
+           2. 根据id查找对应的资源
+           3. 显示资源信息，并设置正确的下载链接
+           ============================================================ -->
+    <script>
+        // ============================================================
+        // 1. 资源数据库：所有可下载资源的清单
+        //    格式：{ id, name, desc, file }
+        //    - id：唯一标识（必须和 resource.html 里的 ?id=xxx 一致）
+        //    - name：资源名称（显示在页面上）
+        //    - desc：资源描述（显示在页面上）
+        //    - file：文件名（必须放在仓库的 files/ 文件夹里）
+        //    注意：以后要增加新资源，就在这里添加一个新对象
+        // ============================================================
+        const resources = [
+            // ---- MC 启动器 ----
+            {
+                id: 'hmcl',
+                name: 'HMCL 启动器',
+                desc: '开源 Minecraft 启动器，支持多版本管理',
+                file: 'HMCL.exe'
+            },
+            {
+                id: 'pcl2',
+                name: 'PCL2 启动器',
+                desc: 'Plain Craft Launcher 2，国内最常用启动器',
+                file: 'PCL2.exe'
+            },
+            {
+                id: 'bakaxl',
+                name: 'BakaXL 启动器',
+                desc: '界面美观的 Minecraft 启动器',
+                file: 'BakaXL.exe'
+            },
 
             // ---- MC 模组 ----
-            { id: 'optifine', name: 'OptiFine', desc: '优化 MC 性能，支持光影效果', file: 'OptiFine.jar' },
-            { id: 'forge', name: 'Forge', desc: 'Minecraft 模组加载器（API）', file: 'forge-installer.jar' },
+            {
+                id: 'optifine',
+                name: 'OptiFine',
+                desc: '优化 MC 性能，支持光影效果',
+                file: 'OptiFine.jar'
+            },
+            {
+                id: 'forge',
+                name: 'Forge',
+                desc: 'Minecraft 模组加载器（API）',
+                file: 'forge-installer.jar'
+            },
 
             // ---- MC 材质包 ----
-            { id: 'faithful', name: 'Faithful 材质包', desc: '经典高清原版风格材质包', file: 'Faithful.zip' },
+            {
+                id: 'faithful',
+                name: 'Faithful 材质包',
+                desc: '经典高清原版风格材质包',
+                file: 'Faithful.zip'
+            },
 
             // ---- MC 服务端 ----
-            { id: 'paper', name: 'Paper 服务端', desc: '高性能 Spigot 分支服务端', file: 'paper-server.jar' },
+            {
+                id: 'paper',
+                name: 'Paper 服务端',
+                desc: '高性能 Spigot 分支服务端',
+                file: 'paper-server.jar'
+            },
 
             // ---- 设计工具 ----
-            { id: 'ps2025', name: 'Photoshop 2025', desc: '专业图像编辑与设计软件', file: 'Photoshop_2025.exe' },
-            { id: 'figma', name: 'Figma', desc: '在线 UI/UX 协作设计工具', file: 'Figma.zip' },
+            {
+                id: 'ps2025',
+                name: 'Photoshop 2025',
+                desc: '专业图像编辑与设计软件',
+                file: 'Photoshop_2025.exe'
+            },
+            {
+                id: 'figma',
+                name: 'Figma',
+                desc: '在线 UI/UX 协作设计工具',
+                file: 'Figma.zip'
+            },
 
             // ---- 开发工具 ----
-            { id: 'vscode', name: 'VS Code', desc: '轻量级代码编辑器，支持海量扩展', file: 'VSCode.exe' },
-            { id: 'git', name: 'Git', desc: '分布式版本控制系统', file: 'Git.exe' },
+            {
+                id: 'vscode',
+                name: 'VS Code',
+                desc: '轻量级代码编辑器，支持海量扩展',
+                file: 'VSCode.exe'
+            },
+            {
+                id: 'git',
+                name: 'Git',
+                desc: '分布式版本控制系统',
+                file: 'Git.exe'
+            },
 
             // ---- 办公效率 ----
-            { id: 'office2024', name: 'Microsoft Office 2024', desc: 'Word, Excel, PowerPoint 全套', file: 'Office_2024.exe' },
+            {
+                id: 'office2024',
+                name: 'Microsoft Office 2024',
+                desc: 'Word, Excel, PowerPoint 全套',
+                file: 'Office_2024.exe'
+            },
 
             // ---- 游戏资源 ----
-            { id: 'steampp', name: 'Steam++', desc: 'Steam 加速与辅助工具', file: 'Steam++.exe' },
-            { id: 'retroarch', name: 'RetroArch', desc: '多平台游戏模拟器前端', file: 'RetroArch.exe' },
+            {
+                id: 'steampp',
+                name: 'Steam++',
+                desc: 'Steam 加速与辅助工具',
+                file: 'Steam++.exe'
+            },
+            {
+                id: 'retroarch',
+                name: 'RetroArch',
+                desc: '多平台游戏模拟器前端',
+                file: 'RetroArch.exe'
+            },
 
             // ---- 影音处理 ----
-            { id: 'pr2025', name: 'Premiere Pro 2025', desc: '专业视频剪辑软件', file: 'Premiere_2025.exe' },
+            {
+                id: 'pr2025',
+                name: 'Premiere Pro 2025',
+                desc: '专业视频剪辑软件',
+                file: 'Premiere_2025.exe'
+            },
 
             // ---- 其他资源 ----
-            { id: '7zip', name: '7-Zip', desc: '高压缩比文件压缩工具', file: '7-Zip.exe' },
+            {
+                id: '7zip',
+                name: '7-Zip',
+                desc: '高压缩比文件压缩工具',
+                file: '7-Zip.exe'
+            },
         ];
+        // resources 数组结束
 
         // ============================================================
-        // 2. 获取 URL 中的参数（即 ?id=xxx 中的 xxx）
+        // 2. 工具函数：从 URL 中获取参数值
+        //    例如：download.html?id=hmcl → 返回 'hmcl'
         // ============================================================
         function getUrlParam(paramName) {
+            // 获取当前页面的完整URL地址
             const url = window.location.href;
+            // 创建一个URL对象，方便解析参数
             const urlObj = new URL(url);
+            // 从URL中获取指定参数的值，如果没有则返回null
             return urlObj.searchParams.get(paramName);
         }
 
         // ============================================================
-        // 3. 根据 id 查找资源
+        // 3. 工具函数：根据 id 在 resources 数组中查找资源
+        //    如果找到则返回该资源对象，找不到则返回 undefined
         // ============================================================
         function findResource(id) {
+            // 使用数组的 find 方法，遍历 resources 数组
+            // 找到 item.id === id 的那一项并返回
             return resources.find(item => item.id === id);
         }
 
         // ============================================================
-        // 4. 获取当前要下载的资源 ID
+        // 4. 获取当前要下载的资源 ID（从URL参数中读取）
         // ============================================================
         const resourceId = getUrlParam('id');
 
         // ============================================================
-        // 5. 获取页面元素的引用
+        // 5. 获取页面元素的引用（方便后续操作）
+        //    document.getElementById()：通过id获取页面上的元素
         // ============================================================
         const infoArea = document.getElementById('info-area');
+        // infoArea：资源信息显示区域
         const downloadBtn = document.getElementById('downloadBtn');
+        // downloadBtn：下载按钮
 
         // ============================================================
-        // 6. 根据资源 ID 渲染页面内容
+        // 6. 核心逻辑：根据资源 ID 渲染页面内容
+        //    分三种情况处理：
+        //    情况A：有id，且找到了对应的资源 → 正常显示，启用下载
+        //    情况B：有id，但找不到对应的资源 → 显示错误，禁用下载
+        //    情况C：没有id参数 → 提示用户，禁用下载
         // ============================================================
+
+        // ----- 情况判断：检查 resourceId 是否存在 -----
         if (resourceId) {
+            // 情况A或B：URL中有 ?id=xxx 参数
+
+            // 根据 id 查找对应的资源
             const resource = findResource(resourceId);
 
             if (resource) {
-                // 找到了资源 —— 正常显示
+                // ----- 情况A：找到了对应的资源 -----
+
+                // 步骤1：在信息区域显示资源信息
+                // 使用 innerHTML 动态生成HTML内容
                 infoArea.innerHTML = `
                     <div class="name">📦 ${resource.name}</div>
+                    <!-- 显示资源名称 -->
                     <div class="desc">${resource.desc}</div>
+                    <!-- 显示资源描述 -->
                     <span class="id-tag">ID: ${resource.id}</span>
+                    <!-- 显示资源ID（方便调试） -->
                 `;
-                // 设置下载链接指向 files/ 文件夹
+
+                // 步骤2：设置下载按钮的链接
+                // 指向仓库 files/ 文件夹下的对应文件
+                // 注意：这里使用相对路径，因为 files/ 就在仓库根目录下
                 downloadBtn.href = `files/${resource.file}`;
+
+                // 步骤3：确保下载按钮是启用状态
+                // 移除可能存在的 disabled 类
+                downloadBtn.classList.remove('disabled');
+                // 恢复按钮文字
+                downloadBtn.textContent = '⬇️ 立即下载';
+
             } else {
-                // 资源不存在 —— 显示错误
+                // ----- 情况B：有id，但找不到对应的资源 -----
+
+                // 步骤1：在信息区域显示错误信息
                 infoArea.innerHTML = `
                     <div class="error-msg">❌ 未找到 ID 为 "<strong>${resourceId}</strong>" 的资源</div>
-                    <p style="color:#555; font-size:0.9em; margin-top:10px;">请检查链接是否正确，或返回首页重新选择。</p>
+                    <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                        请检查链接是否正确，或返回首页重新选择。
+                    </p>
                 `;
-                downloadBtn.style.backgroundColor = '#999';
-                downloadBtn.style.cursor = 'not-allowed';
+
+                // 步骤2：禁用下载按钮
+                // 将 href 设为 '#'，点击不会跳转
                 downloadBtn.href = '#';
+                // 添加 disabled 类，让按钮变灰（样式在CSS中定义）
+                downloadBtn.classList.add('disabled');
+                // 修改按钮文字，提示用户
                 downloadBtn.textContent = '❌ 资源不存在';
             }
+
         } else {
-            // URL 中没有 id 参数 —— 提示用户
+            // ----- 情况C：URL中没有 ?id=xxx 参数 -----
+
+            // 步骤1：在信息区域显示提示信息
             infoArea.innerHTML = `
                 <div class="error-msg">⚠️ 未指定要下载的资源</div>
-                <p style="color:#555; font-size:0.9em; margin-top:10px;">请从资源中心选择要下载的项目。</p>
+                <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                    请从资源中心选择要下载的项目。
+                </p>
             `;
-            downloadBtn.style.backgroundColor = '#999';
-            downloadBtn.style.cursor = 'not-allowed';
-            downloadBtn.href = `files/${resource.file}`;
-            //downloadBtn.href = '#';
+
+            // 步骤2：禁用下载按钮
+            downloadBtn.href = '#';
+            downloadBtn.classList.add('disabled');
             downloadBtn.textContent = '❌ 请选择资源';
         }
+        // 核心逻辑结束
     </script>
+    <!-- JavaScript部分结束 -->
 
 </body>
+<!-- body部分结束 -->
+
 </html>
+<!-- HTML文档结束 -->'
+            },
+            {
+                id: 'bakaxl',
+                name: 'BakaXL 启动器',
+                desc: '界面美观的 Minecraft 启动器',
+                file: 'BakaXL.exe'
+            },
+
+            // ---- MC 模组 ----
+            {
+                id: 'optifine',
+                name: 'OptiFine',
+                desc: '优化 MC 性能，支持光影效果',
+                file: 'OptiFine.jar'
+            },
+            {
+                id: 'forge',
+                name: 'Forge',
+                desc: 'Minecraft 模组加载器（API）',
+                file: 'forge-installer.jar'
+            },
+
+            // ---- MC 材质包 ----
+            {
+                id: 'faithful',
+                name: 'Faithful 材质包',
+                desc: '经典高清原版风格材质包',
+                file: 'Faithful.zip'
+            },
+
+            // ---- MC 服务端 ----
+            {
+                id: 'paper',
+                name: 'Paper 服务端',
+                desc: '高性能 Spigot 分支服务端',
+                file: 'paper-server.jar'
+            },
+
+            // ---- 设计工具 ----
+            {
+                id: 'ps2025',
+                name: 'Photoshop 2025',
+                desc: '专业图像编辑与设计软件',
+                file: 'Photoshop_2025.exe'
+            },
+            {
+                id: 'figma',
+                name: 'Figma',
+                desc: '在线 UI/UX 协作设计工具',
+                file: 'Figma.zip'
+            },
+
+            // ---- 开发工具 ----
+            {
+                id: 'vscode',
+                name: 'VS Code',
+                desc: '轻量级代码编辑器，支持海量扩展',
+                file: 'VSCode.exe'
+            },
+            {
+                id: 'git',
+                name: 'Git',
+                desc: '分布式版本控制系统',
+                file: 'Git.exe'
+            },
+
+            // ---- 办公效率 ----
+            {
+                id: 'office2024',
+                name: 'Microsoft Office 2024',
+                desc: 'Word, Excel, PowerPoint 全套',
+                file: 'Office_2024.exe'
+            },
+
+            // ---- 游戏资源 ----
+            {
+                id: 'steampp',
+                name: 'Steam++',
+                desc: 'Steam 加速与辅助工具',
+                file: 'Steam++.exe'
+            },
+            {
+                id: 'retroarch',
+                name: 'RetroArch',
+                desc: '多平台游戏模拟器前端',
+                file: 'RetroArch.exe'
+            },
+
+            // ---- 影音处理 ----
+            {
+                id: 'pr2025',
+                name: 'Premiere Pro 2025',
+                desc: '专业视频剪辑软件',
+                file: 'Premiere_2025.exe'
+            },
+
+            // ---- 其他资源 ----
+            {
+                id: '7zip',
+                name: '7-Zip',
+                desc: '高压缩比文件压缩工具',
+                file: '7-Zip.exe'
+            },
+        ];
+        // resources 数组结束
+
+        // ============================================================
+        // 2. 工具函数：从 URL 中获取参数值
+        //    例如：download.html?id=hmcl → 返回 'hmcl'
+        // ============================================================
+        function getUrlParam(paramName) {
+            // 获取当前页面的完整URL地址
+            const url = window.location.href;
+            // 创建一个URL对象，方便解析参数
+            const urlObj = new URL(url);
+            // 从URL中获取指定参数的值，如果没有则返回null
+            return urlObj.searchParams.get(paramName);
+        }
+
+        // ============================================================
+        // 3. 工具函数：根据 id 在 resources 数组中查找资源
+        //    如果找到则返回该资源对象，找不到则返回 undefined
+        // ============================================================
+        function findResource(id) {
+            // 使用数组的 find 方法，遍历 resources 数组
+            // 找到 item.id === id 的那一项并返回
+            return resources.find(item => item.id === id);
+        }
+
+        // ============================================================
+        // 4. 获取当前要下载的资源 ID（从URL参数中读取）
+        // ============================================================
+        const resourceId = getUrlParam('id');
+
+        // ============================================================
+        // 5. 获取页面元素的引用（方便后续操作）
+        //    document.getElementById()：通过id获取页面上的元素
+        // ============================================================
+        const infoArea = document.getElementById('info-area');
+        // infoArea：资源信息显示区域
+        const downloadBtn = document.getElementById('downloadBtn');
+        // downloadBtn：下载按钮
+
+        // ============================================================
+        // 6. 核心逻辑：根据资源 ID 渲染页面内容
+        //    分三种情况处理：
+        //    情况A：有id，且找到了对应的资源 → 正常显示，启用下载
+        //    情况B：有id，但找不到对应的资源 → 显示错误，禁用下载
+        //    情况C：没有id参数 → 提示用户，禁用下载
+        // ============================================================
+
+        // ----- 情况判断：检查 resourceId 是否存在 -----
+        if (resourceId) {
+            // 情况A或B：URL中有 ?id=xxx 参数
+
+            // 根据 id 查找对应的资源
+            const resource = findResource(resourceId);
+
+            if (resource) {
+                // ----- 情况A：找到了对应的资源 -----
+
+                // 步骤1：在信息区域显示资源信息
+                // 使用 innerHTML 动态生成HTML内容
+                infoArea.innerHTML = `
+                    <div class="name">📦 ${resource.name}</div>
+                    <!-- 显示资源名称 -->
+                    <div class="desc">${resource.desc}</div>
+                    <!-- 显示资源描述 -->
+                    <span class="id-tag">ID: ${resource.id}</span>
+                    <!-- 显示资源ID（方便调试） -->
+                `;
+
+                // 步骤2：设置下载按钮的链接
+                // 指向仓库 files/ 文件夹下的对应文件
+                // 注意：这里使用相对路径，因为 files/ 就在仓库根目录下
+                downloadBtn.href = `files/${resource.file}`;
+
+                // 步骤3：确保下载按钮是启用状态
+                // 移除可能存在的 disabled 类
+                downloadBtn.classList.remove('disabled');
+                // 恢复按钮文字
+                downloadBtn.textContent = '⬇️ 立即下载';
+
+            } else {
+                // ----- 情况B：有id，但找不到对应的资源 -----
+
+                // 步骤1：在信息区域显示错误信息
+                infoArea.innerHTML = `
+                    <div class="error-msg">❌ 未找到 ID 为 "<strong>${resourceId}</strong>" 的资源</div>
+                    <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                        请检查链接是否正确，或返回首页重新选择。
+                    </p>
+                `;
+
+                // 步骤2：禁用下载按钮
+                // 将 href 设为 '#'，点击不会跳转
+                downloadBtn.href = '#';
+                // 添加 disabled 类，让按钮变灰（样式在CSS中定义）
+                downloadBtn.classList.add('disabled');
+                // 修改按钮文字，提示用户
+                downloadBtn.textContent = '❌ 资源不存在';
+            }
+
+        } else {
+            // ----- 情况C：URL中没有 ?id=xxx 参数 -----
+
+            // 步骤1：在信息区域显示提示信息
+            infoArea.innerHTML = `
+                <div class="error-msg">⚠️ 未指定要下载的资源</div>
+                <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                    请从资源中心选择要下载的项目。
+                </p>
+            `;
+
+            // 步骤2：禁用下载按钮
+            downloadBtn.href = '#';
+            downloadBtn.classList.add('disabled');
+            downloadBtn.textContent = '❌ 请选择资源';
+        }
+        // 核心逻辑结束
+    </script>
+    <!-- JavaScript部分结束 -->
+
+</body>
+<!-- body部分结束 -->
+
+</html>
+<!-- HTML文档结束 -->'
+            },
+            {
+                id: 'bakaxl',
+                name: 'BakaXL 启动器',
+                desc: '界面美观的 Minecraft 启动器',
+                file: 'BakaXL.exe'
+            },
+
+            // ---- MC 模组 ----
+            {
+                id: 'optifine',
+                name: 'OptiFine',
+                desc: '优化 MC 性能，支持光影效果',
+                file: 'OptiFine.jar'
+            },
+            {
+                id: 'forge',
+                name: 'Forge',
+                desc: 'Minecraft 模组加载器（API）',
+                file: 'forge-installer.jar'
+            },
+
+            // ---- MC 材质包 ----
+            {
+                id: 'faithful',
+                name: 'Faithful 材质包',
+                desc: '经典高清原版风格材质包',
+                file: 'Faithful.zip'
+            },
+
+            // ---- MC 服务端 ----
+            {
+                id: 'paper',
+                name: 'Paper 服务端',
+                desc: '高性能 Spigot 分支服务端',
+                file: 'paper-server.jar'
+            },
+
+            // ---- 设计工具 ----
+            {
+                id: 'ps2025',
+                name: 'Photoshop 2025',
+                desc: '专业图像编辑与设计软件',
+                file: 'Photoshop_2025.exe'
+            },
+            {
+                id: 'figma',
+                name: 'Figma',
+                desc: '在线 UI/UX 协作设计工具',
+                file: 'Figma.zip'
+            },
+
+            // ---- 开发工具 ----
+            {
+                id: 'vscode',
+                name: 'VS Code',
+                desc: '轻量级代码编辑器，支持海量扩展',
+                file: 'VSCode.exe'
+            },
+            {
+                id: 'git',
+                name: 'Git',
+                desc: '分布式版本控制系统',
+                file: 'Git.exe'
+            },
+
+            // ---- 办公效率 ----
+            {
+                id: 'office2024',
+                name: 'Microsoft Office 2024',
+                desc: 'Word, Excel, PowerPoint 全套',
+                file: 'Office_2024.exe'
+            },
+
+            // ---- 游戏资源 ----
+            {
+                id: 'steampp',
+                name: 'Steam++',
+                desc: 'Steam 加速与辅助工具',
+                file: 'Steam++.exe'
+            },
+            {
+                id: 'retroarch',
+                name: 'RetroArch',
+                desc: '多平台游戏模拟器前端',
+                file: 'RetroArch.exe'
+            },
+
+            // ---- 影音处理 ----
+            {
+                id: 'pr2025',
+                name: 'Premiere Pro 2025',
+                desc: '专业视频剪辑软件',
+                file: 'Premiere_2025.exe'
+            },
+
+            // ---- 其他资源 ----
+            {
+                id: '7zip',
+                name: '7-Zip',
+                desc: '高压缩比文件压缩工具',
+                file: '7-Zip.exe'
+            },
+        ];
+        // resources 数组结束
+
+        // ============================================================
+        // 2. 工具函数：从 URL 中获取参数值
+        //    例如：download.html?id=hmcl → 返回 'hmcl'
+        // ============================================================
+        function getUrlParam(paramName) {
+            // 获取当前页面的完整URL地址
+            const url = window.location.href;
+            // 创建一个URL对象，方便解析参数
+            const urlObj = new URL(url);
+            // 从URL中获取指定参数的值，如果没有则返回null
+            return urlObj.searchParams.get(paramName);
+        }
+
+        // ============================================================
+        // 3. 工具函数：根据 id 在 resources 数组中查找资源
+        //    如果找到则返回该资源对象，找不到则返回 undefined
+        // ============================================================
+        function findResource(id) {
+            // 使用数组的 find 方法，遍历 resources 数组
+            // 找到 item.id === id 的那一项并返回
+            return resources.find(item => item.id === id);
+        }
+
+        // ============================================================
+        // 4. 获取当前要下载的资源 ID（从URL参数中读取）
+        // ============================================================
+        const resourceId = getUrlParam('id');
+
+        // ============================================================
+        // 5. 获取页面元素的引用（方便后续操作）
+        //    document.getElementById()：通过id获取页面上的元素
+        // ============================================================
+        const infoArea = document.getElementById('info-area');
+        // infoArea：资源信息显示区域
+        const downloadBtn = document.getElementById('downloadBtn');
+        // downloadBtn：下载按钮
+
+        // ============================================================
+        // 6. 核心逻辑：根据资源 ID 渲染页面内容
+        //    分三种情况处理：
+        //    情况A：有id，且找到了对应的资源 → 正常显示，启用下载
+        //    情况B：有id，但找不到对应的资源 → 显示错误，禁用下载
+        //    情况C：没有id参数 → 提示用户，禁用下载
+        // ============================================================
+
+        // ----- 情况判断：检查 resourceId 是否存在 -----
+        if (resourceId) {
+            // 情况A或B：URL中有 ?id=xxx 参数
+
+            // 根据 id 查找对应的资源
+            const resource = findResource(resourceId);
+
+            if (resource) {
+                // ----- 情况A：找到了对应的资源 -----
+
+                // 步骤1：在信息区域显示资源信息
+                // 使用 innerHTML 动态生成HTML内容
+                infoArea.innerHTML = `
+                    <div class="name">📦 ${resource.name}</div>
+                    <!-- 显示资源名称 -->
+                    <div class="desc">${resource.desc}</div>
+                    <!-- 显示资源描述 -->
+                    <span class="id-tag">ID: ${resource.id}</span>
+                    <!-- 显示资源ID（方便调试） -->
+                `;
+
+                // 步骤2：设置下载按钮的链接
+                // 指向仓库 files/ 文件夹下的对应文件
+                // 注意：这里使用相对路径，因为 files/ 就在仓库根目录下
+                downloadBtn.href = `files/${resource.file}`;
+
+                // 步骤3：确保下载按钮是启用状态
+                // 移除可能存在的 disabled 类
+                downloadBtn.classList.remove('disabled');
+                // 恢复按钮文字
+                downloadBtn.textContent = '⬇️ 立即下载';
+
+            } else {
+                // ----- 情况B：有id，但找不到对应的资源 -----
+
+                // 步骤1：在信息区域显示错误信息
+                infoArea.innerHTML = `
+                    <div class="error-msg">❌ 未找到 ID 为 "<strong>${resourceId}</strong>" 的资源</div>
+                    <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                        请检查链接是否正确，或返回首页重新选择。
+                    </p>
+                `;
+
+                // 步骤2：禁用下载按钮
+                // 将 href 设为 '#'，点击不会跳转
+                downloadBtn.href = '#';
+                // 添加 disabled 类，让按钮变灰（样式在CSS中定义）
+                downloadBtn.classList.add('disabled');
+                // 修改按钮文字，提示用户
+                downloadBtn.textContent = '❌ 资源不存在';
+            }
+
+        } else {
+            // ----- 情况C：URL中没有 ?id=xxx 参数 -----
+
+            // 步骤1：在信息区域显示提示信息
+            infoArea.innerHTML = `
+                <div class="error-msg">⚠️ 未指定要下载的资源</div>
+                <p style="color:#555; font-size:0.9em; margin-top:10px;">
+                    请从资源中心选择要下载的项目。
+                </p>
+            `;
+
+            // 步骤2：禁用下载按钮
+            downloadBtn.href = '#';
+            downloadBtn.classList.add('disabled');
+            downloadBtn.textContent = '❌ 请选择资源';
+        }
+        // 核心逻辑结束
+    </script>
+    <!-- JavaScript部分结束 -->
+
+</body>
+<!-- body部分结束 -->
+
+</html>
+<!-- HTML文档结束 -->
