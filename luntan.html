@@ -1,1 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 字符编码：让浏览器正确显示中文 -->
+    <meta charset="utf-8">
+    <!-- 页面标题：显示在浏览器标签栏上 -->
+    <title>论坛 - 自制网</title>
+    <!-- 视口设置：让页面在手机上也能自适应 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ============================================================
+               style标签：所有样式代码
+               ============================================================ */
 
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            /* 清除默认外边距 */
+            padding: 0;
+            /* 清除默认内边距 */
+            box-sizing: border-box;
+            /* 让边框和内边距算在总宽高里 */
+        }
+
+        /* ===== 页面主体 ===== */
+        body {
+            background-color: #ADD8E6;
+            /* 浅蓝色背景 */
+            font-family: "微软雅黑", sans-serif;
+            /* 字体 */
+            display: flex;
+            /* flex布局，让侧边栏和主内容并排 */
+            height: 100vh;
+            /* 占满视口高度 */
+        }
+
+        /* ============================================================
+               侧边栏样式（左侧导航）
+               ============================================================ */
+        .sidebar {
+            width: 220px;
+            /* 固定宽度 */
+            background-color: #2c3e50;
+            /* 深色背景 */
+            color: #ffffff;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #87CEFA;
+            font-size: 1.3em;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a5a6a;
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #d0d7de;
+            font-size: 1em;
+            padding: 10px 14px;
+            text-align: left;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+        }
+
+        .sidebar button:hover {
+            background-color: #3a4a5a;
+            color: #ffffff;
+        }
+
+        .sidebar button.active {
+            background-color: #1a2a3a;
+            color: #87CEFA;
+            font-weight: bold;
+            border-left: 4px solid #87CEFA;
+        }
+
+        /* ===== 侧边栏底部的返回首页链接 ===== */
+        .sidebar .back-home {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #4a5a6a;
+            text-align: center;
+        }
+
+        .sidebar .back-home a {
+            color: #87CEFA;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar .back-home a:hover {
+            background-color: #3a4a5a;
+        }
+
+        /* ============================================================
+               主内容区
+               ============================================================ */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+               顶部导航栏（账号、注册、登录、搜索）
+               ============================================================ */
+        .top-nav {
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-nav .logo {
+            color: #87CEFA;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .top-nav .right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .top-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s;
+        }
+
+        .top-nav a:hover {
+            color: #87CEFA;
+        }
+
+        .top-nav .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .top-nav .search-box input {
+            padding: 6px 15px;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            outline: none;
+            font-size: 0.9em;
+            width: 150px;
+            font-family: inherit;
+        }
+
+        .top-nav .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .top-nav .search-box button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            padding: 6px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .top-nav .search-box button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ============================================================
+               自动滑动轮播区（正文页面顶部）
+               ============================================================ */
+        .carousel-section {
+            flex-shrink: 0;
+            padding: 15px 30px 0 30px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 16px;
+            background-color: #2c3e50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .carousel-slide:nth-child(1) {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+        }
+        .carousel-slide:nth-child(2) {
+            background: linear-gradient(135deg, #2c3e50, #1a2a3a);
+        }
+        .carousel-slide:nth-child(3) {
+            background: linear-gradient(135deg, #1a2a3a, #3a4a5a);
+        }
+        .carousel-slide:nth-child(4) {
+            background: linear-gradient(135deg, #2c3e50, #1a2a3a);
+        }
+        .carousel-slide:nth-child(5) {
+            background: linear-gradient(135deg, #3a4a5a, #1a2a3a);
+        }
+
+        /* 轮播指示器（小圆点） */
+        .carousel-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .carousel-dots span.active {
+            background-color: #87CEFA;
+        }
+
+        /* ============================================================
+               帖子列表区域（正文内容）
+               ============================================================ */
+        .posts-area {
+            flex: 1;
+            padding: 20px 30px 30px 30px;
+            overflow-y: auto;
+        }
+
+        .posts-area h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 8px;
+        }
+
+        /* 每个帖子卡片 */
+        .post-item {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #2c3e50;
+            transition: background 0.2s;
+        }
+
+        .post-item:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .post-item .title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .post-item .meta {
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .post-item .meta span {
+            display: inline-block;
+        }
+
+        .post-item .tags {
+            margin-top: 6px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .post-item .tags .tag {
+            background-color: #2c3e50;
+            color: #87CEFA;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+
+        /* ============================================================
+               隐藏切换：不同版块显示不同的帖子列表
+               ============================================================ */
+        .forum-section {
+            display: none;
+            /* 默认隐藏 */
+        }
+
+        .forum-section.active {
+            display: block;
+            /* 当前激活的显示 */
+        }
+
+        /* ============================================================
+               响应式：手机窄屏适配
+               ============================================================ */
+        @media (max-width: 700px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 10px 15px;
+                align-items: center;
+            }
+            .sidebar h2 {
+                width: 100%;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .sidebar li {
+                margin-bottom: 0;
+            }
+            .sidebar button {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+            .sidebar .back-home {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+                margin-left: auto;
+            }
+            .top-nav {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-nav .right {
+                justify-content: center;
+            }
+            .top-nav .search-box input {
+                width: 120px;
+            }
+            .carousel-section {
+                padding: 10px 15px 0 15px;
+            }
+            .carousel-container {
+                height: 140px;
+            }
+            .carousel-slide {
+                font-size: 1.2em;
+            }
+            .posts-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+           侧边栏（左侧导航）
+           ============================================================ -->
+    <nav class="sidebar">
+        <h2>📂 论坛版块</h2>
+        <ul>
+            <!-- 综合版块（默认激活） -->
+            <li><button class="active" data-target="section-general">📋 综合</button></li>
+            <!-- 生电版块 -->
+            <li><button data-target="section-survival">⚡ 生电</button></li>
+            <!-- PVP版块 -->
+            <li><button data-target="section-pvp">⚔️ PVP</button></li>
+            <!-- MOD版块 -->
+            <li><button data-target="section-mod">🧩 MOD</button></li>
+        </ul>
+        <!-- 返回首页 -->
+        <div class="back-home">
+            <a href="index.html">← 返回首页</a>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+           主内容区
+           ============================================================ -->
+    <div class="main-content">
+
+        <!-- ============================================================
+               顶部导航栏（账号、注册、登录、搜索）
+               ============================================================ -->
+        <nav class="top-nav">
+            <div class="logo">🎮 我的论坛</div>
+            <div class="right">
+                <!-- 搜索框 -->
+                <div class="search-box">
+                    <input type="text" placeholder="搜索帖子..." id="searchInput">
+                    <button onclick="searchPosts()">🔍</button>
+                </div>
+                <!-- 账号相关链接 -->
+                <a href="#" onclick="alert('注册功能开发中')">注册</a>
+                <a href="#" onclick="alert('登录功能开发中')">登录</a>
+                <a href="#" onclick="alert('账号功能开发中')">👤 账号</a>
+            </div>
+        </nav>
+
+        <!-- ============================================================
+               自动滑动轮播区（正文页面顶部）
+               ============================================================ -->
+        <div class="carousel-section">
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide">🎉 欢迎来到论坛！</div>
+                    <div class="carousel-slide">⚡ 生电专区 — 红石、机器、自动化</div>
+                    <div class="carousel-slide">⚔️ PVP专区 — 战斗技巧、竞技场</div>
+                    <div class="carousel-slide">🧩 MOD专区 — 模组推荐、整合包</div>
+                    <div class="carousel-slide">📋 综合讨论 — 闲聊、问答、攻略</div>
+                </div>
+                <!-- 小圆点指示器 -->
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+               帖子列表区域（正文内容）
+               根据不同版块显示不同内容
+               ============================================================ -->
+        <div class="posts-area">
+
+            <!-- ===== 综合版块（默认显示） ===== -->
+            <div class="forum-section active" id="section-general">
+                <h2>📋 综合讨论</h2>
+                <!-- 帖子1 -->
+                <div class="post-item">
+                    <div class="title">欢迎来到论坛！新人请先看这里</div>
+                    <div class="meta">
+                        <span>👤 管理员</span>
+                        <span>📅 2025-07-17</span>
+                        <span>💬 12 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">公告</span>
+                        <span class="tag">新人</span>
+                    </div>
+                </div>
+                <!-- 帖子2 -->
+                <div class="post-item">
+                    <div class="title">大家平时都玩什么版本？</div>
+                    <div class="meta">
+                        <span>👤 玩家A</span>
+                        <span>📅 2025-07-16</span>
+                        <span>💬 8 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">讨论</span>
+                        <span class="tag">版本</span>
+                    </div>
+                </div>
+                <!-- 帖子3 -->
+                <div class="post-item">
+                    <div class="title">求助：服务器经常卡顿怎么办？</div>
+                    <div class="meta">
+                        <span>👤 玩家B</span>
+                        <span>📅 2025-07-15</span>
+                        <span>💬 5 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">求助</span>
+                        <span class="tag">服务器</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 生电版块 ===== -->
+            <div class="forum-section" id="section-survival">
+                <h2>⚡ 生电专区</h2>
+                <div class="post-item">
+                    <div class="title">高效刷铁机教程（1.20+）</div>
+                    <div class="meta">
+                        <span>👤 红石大师</span>
+                        <span>📅 2025-07-17</span>
+                        <span>💬 15 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">教程</span>
+                        <span class="tag">红石</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">全自动甘蔗农场设计方案</div>
+                    <div class="meta">
+                        <span>👤 农场主</span>
+                        <span>📅 2025-07-14</span>
+                        <span>💬 6 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">设计</span>
+                        <span class="tag">自动化</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">潜影贝农场改良版</div>
+                    <div class="meta">
+                        <span>👤 技术宅</span>
+                        <span>📅 2025-07-12</span>
+                        <span>💬 9 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">改良</span>
+                        <span class="tag">潜影贝</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PVP版块 ===== -->
+            <div class="forum-section" id="section-pvp">
+                <h2>⚔️ PVP专区</h2>
+                <div class="post-item">
+                    <div class="title">PVP进阶技巧：连击与走位</div>
+                    <div class="meta">
+                        <span>👤 PVP高手</span>
+                        <span>📅 2025-07-16</span>
+                        <span>💬 10 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">技巧</span>
+                        <span class="tag">连击</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">1.9+ 版本PVP武器选择指南</div>
+                    <div class="meta">
+                        <span>👤 武器大师</span>
+                        <span>📅 2025-07-13</span>
+                        <span>💬 7 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">攻略</span>
+                        <span class="tag">武器</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">竞技场地图推荐合集</div>
+                    <div class="meta">
+                        <span>👤 地图作者</span>
+                        <span>📅 2025-07-11</span>
+                        <span>💬 4 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">地图</span>
+                        <span class="tag">竞技场</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MOD版块 ===== -->
+            <div class="forum-section" id="section-mod">
+                <h2>🧩 MOD专区</h2>
+                <div class="post-item">
+                    <div class="title">2025年必备MOD推荐列表</div>
+                    <div class="meta">
+                        <span>👤 MOD收集者</span>
+                        <span>📅 2025-07-17</span>
+                        <span>💬 20 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">推荐</span>
+                        <span class="tag">合集</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">机械动力模组新手教程</div>
+                    <div class="meta">
+                        <span>👤 工程师</span>
+                        <span>📅 2025-07-15</span>
+                        <span>💬 11 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">教程</span>
+                        <span class="tag">机械动力</span>
+                    </div>
+                </div>
+                <div class="post-item">
+                    <div class="title">暮色森林整合包体验分享</div>
+                    <div class="meta">
+                        <span>👤 冒险家</span>
+                        <span>📅 2025-07-10</span>
+                        <span>💬 6 回复</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">整合包</span>
+                        <span class="tag">冒险</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- 帖子列表区域结束 -->
+
+    </div>
+    <!-- 主内容区结束 -->
+
+
+    <!-- ============================================================
+           JavaScript：交互逻辑
+           ============================================================ -->
+    <script>
+        // ============================================================
+        // 1. 侧边栏切换版块
+        // ============================================================
+        const sidebarButtons = document.querySelectorAll('.sidebar button');
+        const forumSections = document.querySelectorAll('.forum-section');
+
+        sidebarButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 移除所有按钮的 active 类
+                sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                // 给当前按钮添加 active
+                this.classList.add('active');
+
+                // 获取目标版块 id
+                const targetId = this.getAttribute('data-target');
+
+                // 隐藏所有版块
+                forumSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // 显示对应的版块
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        // ============================================================
+        // 2. 自动轮播（5秒切换一张）
+        // ============================================================
+        let currentSlide = 0;
+        const track = document.getElementById('carouselTrack');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const totalSlides = slides.length;
+        const dotsContainer = document.getElementById('carouselDots');
+
+        // 创建小圆点
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', function() {
+                goToSlide(i);
+            });
+            dotsContainer.appendChild(dot);
+        }
+
+        const dots = dotsContainer.querySelectorAll('span');
+
+        // 跳转到指定幻灯片
+        function goToSlide(index) {
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            currentSlide = index;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            // 更新小圆点状态
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        // 下一张
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        // 自动播放：每5秒切换一张
+        let autoPlay = setInterval(nextSlide, 5000);
+
+        // 鼠标悬停时暂停轮播
+        const carouselContainer = document.getElementById('carouselContainer');
+        carouselContainer.addEventListener('mouseenter', function() {
+            clearInterval(autoPlay);
+        });
+        carouselContainer.addEventListener('mouseleave', function() {
+            autoPlay = setInterval(nextSlide, 5000);
+        });
+
+        // ============================================================
+        // 3. 搜索功能（简单过滤帖子标题）
+        // ============================================================
+        function searchPosts() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value.trim().toLowerCase();
+            const allPosts = document.querySelectorAll('.post-item');
+
+            if (keyword === '') {
+                // 如果搜索框为空，显示所有帖子
+                allPosts.forEach(post => {
+                    post.style.display = 'flex';
+                });
+                return;
+            }
+
+            allPosts.forEach(post => {
+                const title = post.querySelector('.title').textContent.toLowerCase();
+                if (title.includes(keyword)) {
+                    post.style.display = 'flex';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        }
+
+        // 按回车键也可以触发搜索
+        document.getElementById('searchInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                searchPosts();
+            }
+        });
+
+        // ============================================================
+        // 4. 点击"综合"按钮时，重置搜索结果显示所有帖子
+        // ============================================================
+        // 在切换版块时，重置搜索框并显示所有帖子
+        sidebarButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 清空搜索框
+                document.getElementById('searchInput').value = '';
+                // 显示所有帖子
+                document.querySelectorAll('.post-item').forEach(post => {
+                    post.style.display = 'flex';
+                });
+            });
+        });
+
+        console.log('🎮 论坛加载完成！');
+    </script>
+
+</body>
+</html>
