@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>论坛 - 自制网</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #ADD8E6;
+            font-family: "微软雅黑", sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #87CEFA;
+            font-size: 1.3em;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a5a6a;
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #d0d7de;
+            font-size: 1em;
+            padding: 10px 14px;
+            text-align: left;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+        }
+
+        .sidebar button:hover {
+            background-color: #3a4a5a;
+            color: #ffffff;
+        }
+
+        .sidebar button.active {
+            background-color: #1a2a3a;
+            color: #87CEFA;
+            font-weight: bold;
+            border-left: 4px solid #87CEFA;
+        }
+
+        .sidebar .back-home {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #4a5a6a;
+            text-align: center;
+        }
+
+        .sidebar .back-home a {
+            color: #87CEFA;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar .back-home a:hover {
+            background-color: #3a4a5a;
+        }
+
+        /* ===== 主内容区 ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-nav .logo {
+            color: #87CEFA;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .top-nav .right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .top-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s;
+        }
+
+        .top-nav a:hover {
+            color: #87CEFA;
+        }
+
+        .top-nav .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .top-nav .search-box input {
+            padding: 6px 15px;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            outline: none;
+            font-size: 0.9em;
+            width: 150px;
+            font-family: inherit;
+        }
+
+        .top-nav .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .top-nav .search-box button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            padding: 6px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .top-nav .search-box button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== 轮播 ===== */
+        .carousel-section {
+            flex-shrink: 0;
+            padding: 15px 30px 0 30px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 16px;
+            background-color: #2c3e50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .carousel-slide:nth-child(1) {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+        }
+        .carousel-slide:nth-child(2) {
+            background: linear-gradient(135deg, #2c3e50, #1a2a3a);
+        }
+        .carousel-slide:nth-child(3) {
+            background: linear-gradient(135deg, #1a2a3a, #3a4a5a);
+        }
+        .carousel-slide:nth-child(4) {
+            background: linear-gradient(135deg, #2c3e50, #1a2a3a);
+        }
+        .carousel-slide:nth-child(5) {
+            background: linear-gradient(135deg, #3a4a5a, #1a2a3a);
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .carousel-dots span.active {
+            background-color: #87CEFA;
+        }
+
+        /* ===== 帖子区域 ===== */
+        .posts-area {
+            flex: 1;
+            padding: 20px 30px 30px 30px;
+            overflow-y: auto;
+        }
+
+        /* ===== 发帖按钮 ===== */
+        .new-post-btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+
+        .new-post-btn:hover {
+            background-color: #1a2a3a;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 8px;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .empty-posts {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        /* ============================================================
+           ⭐ 帖子卡片样式（重点在这里）
+           ============================================================ */
+        .post-item {
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(44, 62, 80, 0.08);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .post-item:hover {
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+            transform: translateY(-3px);
+            border-color: rgba(44, 62, 80, 0.15);
+        }
+
+        .post-item .title {
+            font-weight: 600;
+            font-size: 1.15em;
+            color: #1a2634;
+            margin-bottom: 4px;
+        }
+
+        .post-item .content-preview {
+            color: #5a6a7a;
+            font-size: 0.92em;
+            margin-top: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-item .meta {
+            color: #7a8a9a;
+            font-size: 0.82em;
+            margin-top: 10px;
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 10px;
+        }
+
+        .post-item .meta span {
+            display: inline-block;
+        }
+
+        .post-item .tags {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .post-item .tags .tag {
+            background-color: #eef2f7;
+            color: #2c3e50;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.72em;
+            font-weight: 500;
+        }
+
+        /* ===== 发帖弹窗 ===== */
+        .post-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .post-modal-overlay.show {
+            display: flex;
+        }
+
+        .post-modal-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px 35px;
+            width: 500px;
+            max-width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .post-modal-box h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .post-modal-box label {
+            display: block;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+
+        .post-modal-box input,
+        .post-modal-box select,
+        .post-modal-box textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            background: #f8f8f8;
+        }
+
+        .post-modal-box textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .post-modal-box .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            justify-content: flex-end;
+        }
+
+        .post-modal-box .modal-actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .post-modal-box .modal-actions .submit-btn {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .post-modal-box .modal-actions .submit-btn:hover {
+            background-color: #1a2a3a;
+        }
+
+        .post-modal-box .modal-actions .cancel-btn {
+            background-color: #aaa;
+            color: white;
+        }
+
+        .post-modal-box .modal-actions .cancel-btn:hover {
+            background-color: #888;
+        }
+
+        .post-modal-box .char-count {
+            text-align: right;
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* ===== 详情弹窗 ===== */
+        .detail-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail-overlay.show {
+            display: flex;
+        }
+
+        .detail-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px 35px;
+            width: 600px;
+            max-width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .detail-box .close-detail {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.2s;
+        }
+
+        .detail-box .close-detail:hover {
+            color: #333;
+        }
+
+        .detail-box .detail-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            padding-right: 30px;
+        }
+
+        .detail-box .detail-meta {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .detail-box .detail-content {
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.8;
+            padding: 16px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .detail-box .detail-tags {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .detail-box .detail-tags .tag {
+            background-color: #2c3e50;
+            color: #87CEFA;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        /* ===== 评论 ===== */
+        .comment-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid #eee;
+        }
+
+        .comment-section h3 {
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+
+        .comment-item {
+            background-color: #f5f7fa;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+        }
+
+        .comment-item .comment-meta {
+            color: #888;
+            font-size: 0.8em;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+
+        .comment-item .comment-text {
+            color: #333;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .comment-input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .comment-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 0.95em;
+            font-family: inherit;
+            background: #f8f8f8;
+        }
+
+        .comment-input-area input:focus {
+            outline: 2px solid #2c3e50;
+            background: #fff;
+        }
+
+        .comment-input-area button {
+            padding: 10px 24px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .comment-input-area button:hover {
+            background: #1a2a3a;
+        }
+
+        .empty-comments {
+            color: #aaa;
+            font-style: italic;
+            padding: 10px 0;
+            font-size: 0.95em;
+        }
+
+        /* ===== 版块切换 ===== */
+        .forum-section {
+            display: none;
+        }
+
+        .forum-section.active {
+            display: block;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 10px 15px;
+                align-items: center;
+            }
+            .sidebar h2 {
+                width: 100%;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .sidebar li {
+                margin-bottom: 0;
+            }
+            .sidebar button {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+            .sidebar .back-home {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+                margin-left: auto;
+            }
+            .top-nav {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-nav .right {
+                justify-content: center;
+            }
+            .top-nav .search-box input {
+                width: 120px;
+            }
+            .carousel-section {
+                padding: 10px 15px 0 15px;
+            }
+            .carousel-container {
+                height: 140px;
+            }
+            .carousel-slide {
+                font-size: 1.2em;
+            }
+            .posts-area {
+                padding: 15px;
+            }
+            .detail-box {
+                padding: 20px;
+            }
+            .post-modal-box {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 侧边栏 ===== -->
+    <nav class="sidebar">
+        <h2>📂 论坛版块</h2>
+        <ul>
+            <li><button class="active" data-target="section-general">📋 综合</button></li>
+            <li><button data-target="section-survival">⚡ 生电</button></li>
+            <li><button data-target="section-pvp">⚔️ PVP</button></li>
+            <li><button data-target="section-mod">🧩 MOD</button></li>
+        </ul>
+        <div class="back-home">
+            <a href="index.html">← 返回首页</a>
+        </div>
+    </nav>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main-content">
+
+        <!-- ===== 顶部导航 ===== -->
+        <nav class="top-nav">
+            <div class="logo">🎮 我的论坛</div>
+            <div class="right">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索帖子..." id="searchInput">
+                    <button onclick="searchPosts()">🔍</button>
+                </div>
+                <a href="zhuce.html">注册</a>
+                <a href="login.html">登录</a>
+                <a href="#" onclick="handleAccount(); return false;">👤 账号</a>
+            </div>
+        </nav>
+
+        <!-- ===== 轮播 ===== -->
+        <div class="carousel-section">
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide">🎉 欢迎来到论坛！</div>
+                    <div class="carousel-slide">⚡ 生电专区 — 红石、机器、自动化</div>
+                    <div class="carousel-slide">⚔️ PVP专区 — 战斗技巧、竞技场</div>
+                    <div class="carousel-slide">🧩 MOD专区 — 模组推荐、整合包</div>
+                    <div class="carousel-slide">📋 综合讨论 — 闲聊、问答、攻略</div>
+                </div>
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+        </div>
+
+        <!-- ===== 帖子列表 ===== -->
+        <div class="posts-area">
+            <div class="forum-section active" id="section-general"></div>
+            <div class="forum-section" id="section-survival"></div>
+            <div class="forum-section" id="section-pvp"></div>
+            <div class="forum-section" id="section-mod"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== 发帖弹窗 ===== -->
+    <div class="post-modal-overlay" id="postModal">
+        <div class="post-modal-box">
+            <h2>📝 发布新帖子</h2>
+            <label>标题</label>
+            <input type="text" id="postTitle" placeholder="输入帖子标题..." maxlength="50">
+            <div class="char-count"><span id="titleCount">0</span>/50</div>
+
+            <label>版块</label>
+            <select id="postSection">
+                <option value="section-general">📋 综合</option>
+                <option value="section-survival">⚡ 生电</option>
+                <option value="section-pvp">⚔️ PVP</option>
+                <option value="section-mod">🧩 MOD</option>
+            </select>
+
+            <label>内容</label>
+            <textarea id="postContent" placeholder="输入帖子内容..." maxlength="500"></textarea>
+            <div class="char-count"><span id="contentCount">0</span>/500</div>
+
+            <label>标签（用逗号分隔，如：教程,红石）</label>
+            <input type="text" id="postTags" placeholder="例如：教程,红石,1.20">
+
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closePostModal()">取消</button>
+                <button class="submit-btn" onclick="submitPost()">发布帖子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 详情弹窗 ===== -->
+    <div class="detail-overlay" id="detailModal">
+        <div class="detail-box">
+            <button class="close-detail" onclick="closeDetail()">✕</button>
+            <div class="detail-title" id="detailTitle">帖子标题</div>
+            <div class="detail-meta" id="detailMeta">
+                <span>👤 作者</span>
+                <span>📅 日期</span>
+                <span>💬 0 评论</span>
+            </div>
+            <div class="detail-tags" id="detailTags"></div>
+            <div class="detail-content" id="detailContent">帖子内容</div>
+
+            <div class="comment-section">
+                <h3>💬 评论 (<span id="commentCount">0</span>)</h3>
+                <div id="commentList">
+                    <div class="empty-comments">还没有评论，来抢沙发吧！</div>
+                </div>
+                <div class="comment-input-area">
+                    <input type="text" id="commentInput" placeholder="写评论..." maxlength="200">
+                    <button onclick="submitComment()">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 在页面加载完成后绑定点击事件
+//document.addEventListener('DOMContentLoaded', function() {
+    //const accountLink = document.getElementById('accountLink');
+    //if (accountLink) {
+       // accountLink.addEventListener('click', function(e) {
+        //    e.preventDefault(); // 阻止默认跳转
+           // handleAccount();
+       // });
+  //  }
+//});
+        // ===== 侧边栏切换 =====
+        const sidebarButtons = document.querySelectorAll('.sidebar button');
+        const forumSections = document.querySelectorAll('.forum-section');
+
+        sidebarButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const targetId = this.getAttribute('data-target');
+                forumSections.forEach(section => section.classList.remove('active'));
+
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    renderPosts(targetId);
+                }
+                document.getElementById('searchInput').value = '';
+            });
+        });
+
+        // ===== 轮播 =====
+        let currentSlide = 0;
+        const track = document.getElementById('carouselTrack');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const totalSlides = slides.length;
+        const dotsContainer = document.getElementById('carouselDots');
+
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', function() { goToSlide(i); });
+            dotsContainer.appendChild(dot);
+        }
+
+        const dots = dotsContainer.querySelectorAll('span');
+
+        function goToSlide(index) {
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            currentSlide = index;
+            track.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function nextSlide() { goToSlide(currentSlide + 1); }
+
+        let autoPlay = setInterval(nextSlide, 5000);
+        const carouselContainer = document.getElementById('carouselContainer');
+        carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlay); });
+        carouselContainer.addEventListener('mouseleave', function() { autoPlay = setInterval(nextSlide, 5000); });
+
+        // ===== 搜索 =====
+        function searchPosts() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value.trim().toLowerCase();
+            const allPosts = document.querySelectorAll('.post-item');
+
+            if (keyword === '') {
+                allPosts.forEach(post => post.style.display = 'flex');
+                return;
+            }
+
+            allPosts.forEach(post => {
+                const title = post.querySelector('.title').textContent.toLowerCase();
+                post.style.display = title.includes(keyword) ? 'flex' : 'none';
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') searchPosts();
+        });
+
+        // ===== 数据管理 =====
+        function getPosts() {
+            const data = localStorage.getItem('forum_posts');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function savePosts(posts) {
+            localStorage.setItem('forum_posts', JSON.stringify(posts));
+        }
+
+        // ===== 发帖功能 =====
+        function openPostModal() {
+            document.getElementById('postModal').classList.add('show');
+            document.getElementById('postTitle').focus();
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('show');
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postTags').value = '';
+            updateCharCount();
+        }
+
+        function updateCharCount() {
+            document.getElementById('titleCount').textContent = document.getElementById('postTitle').value.length;
+            document.getElementById('contentCount').textContent = document.getElementById('postContent').value.length;
+        }
+
+        document.getElementById('postTitle').addEventListener('input', updateCharCount);
+        document.getElementById('postContent').addEventListener('input', updateCharCount);
+
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) closePostModal();
+        });
+
+        function submitPost() {
+            const title = document.getElementById('postTitle').value.trim();
+            const sectionId = document.getElementById('postSection').value;
+            const content = document.getElementById('postContent').value.trim();
+            const tagsInput = document.getElementById('postTags').value.trim();
+
+            if (!title) { alert('❌ 请输入帖子标题！'); return; }
+            if (title.length < 2) { alert('❌ 标题至少2个字符！'); return; }
+            if (!content) { alert('❌ 请输入帖子内容！'); return; }
+            if (content.length < 5) { alert('❌ 内容至少5个字符！'); return; }
+
+            const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+            const username = localStorage.getItem('forum_current_user') || '匿名玩家';
+
+            const post = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                section: sectionId,
+                author: username,
+                date: new Date().toISOString().slice(0, 10),
+                tags: tags,
+                comments: [],
+                replies: 0
+            };
+
+            const posts = getPosts();
+            posts.unshift(post);
+            savePosts(posts);
+            closePostModal();
+
+            const activeSection = document.querySelector('.forum-section.active');
+            if (activeSection) renderPosts(activeSection.id);
+            alert('✅ 帖子发布成功！');
+        }
+
+        // ============================================================
+        // ⭐ 核心：渲染帖子（生成卡片）
+        // ============================================================
+        function renderPosts(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            const posts = getPosts();
+            const sectionPosts = posts.filter(p => p.section === sectionId);
+
+            // 保留 header
+            let header = section.querySelector('.section-header');
+            section.innerHTML = '';
+
+            if (!header) {
+                header = document.createElement('div');
+                header.className = 'section-header';
+                const h2 = document.createElement('h2');
+                const nameMap = {
+                    'section-general': '📋 综合讨论',
+                    'section-survival': '⚡ 生电专区',
+                    'section-pvp': '⚔️ PVP专区',
+                    'section-mod': '🧩 MOD专区'
+                };
+                h2.textContent = nameMap[sectionId] || sectionId;
+                header.appendChild(h2);
+
+                const btn = document.createElement('button');
+                btn.className = 'new-post-btn';
+                btn.textContent = '📝 发帖';
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    document.getElementById('postSection').value = sectionId;
+                    openPostModal();
+                };
+                header.appendChild(btn);
+            }
+            section.appendChild(header);
+
+            if (sectionPosts.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-posts';
+                empty.textContent = '📭 还没有帖子，快来发布第一个吧！';
+                section.appendChild(empty);
+                return;
+            }
+
+            // 生成卡片
+            sectionPosts.forEach(function(post) {
+                const item = document.createElement('div');
+                item.className = 'post-item';
+                item.style.cursor = 'pointer';
+
+                item.addEventListener('click', function() {
+                    openDetail(post.id);
+                });
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'title';
+                titleDiv.textContent = post.title;
+                item.appendChild(titleDiv);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'content-preview';
+                contentDiv.textContent = post.content.length > 60 ? post.content.slice(0, 60) + '...' : post.content;
+                item.appendChild(contentDiv);
+
+                const meta = document.createElement('div');
+                meta.className = 'meta';
+                const commentCount = (post.comments ? post.comments.length : 0);
+                meta.innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+                item.appendChild(meta);
+
+                if (post.tags && post.tags.length > 0) {
+                    const tagsDiv = document.createElement('div');
+                    tagsDiv.className = 'tags';
+                    post.tags.forEach(function(tag) {
+                        const span = document.createElement('span');
+                        span.className = 'tag';
+                        span.textContent = tag;
+                        tagsDiv.appendChild(span);
+                    });
+                    item.appendChild(tagsDiv);
+                }
+
+                section.appendChild(item);
+            });
+        }
+
+        // ===== 详情 & 评论 =====
+        let currentPostId = null;
+
+        function openDetail(postId) {
+            const posts = getPosts();
+            let post = posts.find(p => p.id === postId);
+            if (!post) { alert('帖子不存在'); return; }
+
+            currentPostId = postId;
+            document.getElementById('detailTitle').textContent = post.title;
+            const commentCount = (post.comments ? post.comments.length : 0);
+            document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+            document.getElementById('detailContent').textContent = post.content;
+
+            const tagsContainer = document.getElementById('detailTags');
+            tagsContainer.innerHTML = '';
+            if (post.tags && post.tags.length > 0) {
+                post.tags.forEach(function(tag) {
+                    const span = document.createElement('span');
+                    span.className = 'tag';
+                    span.textContent = tag;
+                    tagsContainer.appendChild(span);
+                });
+            }
+
+            renderComments(post);
+            document.getElementById('detailModal').classList.add('show');
+            document.getElementById('commentInput').focus();
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('show');
+            currentPostId = null;
+        }
+
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetail();
+        });
+
+        function renderComments(post) {
+            const list = document.getElementById('commentList');
+            const count = document.getElementById('commentCount');
+            const comments = post.comments || [];
+            count.textContent = comments.length;
+
+            if (comments.length === 0) {
+                list.innerHTML = '<div class="empty-comments">还没有评论，来抢沙发吧！</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            comments.forEach(function(comment, index) {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = '<div class="comment-meta"><span>👤 ' + comment.author + '</span><span>📅 ' + comment.date + '</span><span>#' + (index + 1) + '</span></div><div class="comment-text">' + escapeHtml(comment.text) + '</div>';
+                list.appendChild(item);
+            });
+        }
+
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) { alert('请输入评论内容！'); return; }
+            if (text.length < 2) { alert('评论至少2个字符！'); return; }
+            if (!currentPostId) { alert('请先打开一个帖子！'); return; }
+
+            const posts = getPosts();
+            let post = posts.find(p => p.id === currentPostId);
+            if (!post) { alert('帖子已不存在'); return; }
+
+            const username = localStorage.getItem('forum_current_user') || '匿名玩家';
+            if (!post.comments) post.comments = [];
+            post.comments.push({ author: username, text: text, date: new Date().toISOString().slice(0, 10) });
+            post.replies = post.comments.length;
+            savePosts(posts);
+
+            input.value = '';
+            renderComments(post);
+            document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + post.comments.length + ' 评论</span>';
+
+            const activeSection = document.querySelector('.forum-section.active');
+            if (activeSection) renderPosts(activeSection.id);
+        }
+
+        document.getElementById('commentInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') submitComment();
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+// ============================================================
+// 账号按钮：显示当前登录用户，询问是否退出
+// ============================================================
+function handleAccount() {
+    const currentUser = localStorage.getItem('forum_current_user');
+
+    if (currentUser) {
+        if (confirm('当前登录：' + currentUser + '\n\n点击"确定"退出登录')) {
+            localStorage.removeItem('forum_current_user');
+            alert('✅ 已退出登录');
+            location.reload();
+        }
+    } else {
+        window.location.href = 'login.html';
+    }
+}
+
+function updateAccountBtn() {
+    const accountLink = document.getElementById('accountLink');
+    const currentUser = localStorage.getItem('forum_current_user');
+    if (accountLink) {
+        accountLink.textContent = currentUser ? '👤 ' + currentUser : '👤 账号';
+    }
+}
+
+        // ===== 初始化 =====
+        function initForum() {
+            document.querySelectorAll('.forum-section').forEach(section => renderPosts(section.id));
+        }
+        initForum();
+   
+       
+
+
+        console.log('🎮 论坛加载完成！');
+        console.log('📝 发帖功能已加载！');
+        console.log('💬 评论功能已加载！');
+        console.log('💡 点击任意帖子可查看详情和评论');
+    </script>
+
+</body>
+</html>

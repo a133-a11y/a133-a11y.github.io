@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>注册 - 自制网</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            font-family: "微软雅黑", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ===== 注册卡片 ===== */
+        .register-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 45px 40px;
+            width: 400px;
+            max-width: 92%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .register-box h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .register-box .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .register-box label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .register-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            margin-bottom: 18px;
+        }
+
+        .register-box input:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .register-box .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.3s;
+        }
+
+        .register-box .submit-btn:hover {
+            background: #1a2a3a;
+        }
+
+        .register-box .login-link {
+            text-align: center;
+            margin-top: 18px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .register-box .login-link a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-box .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .msg.error {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .msg.success {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-box">
+        <h1>📝 注册账号</h1>
+        <p class="subtitle">创建你的论坛账号</p>
+
+        <!-- 提示消息 -->
+        <div class="msg" id="msgBox"></div>
+
+        <!-- 表单 -->
+        <label>账号名</label>
+        <input type="text" id="username" placeholder="请输入账号名（至少2个字符）">
+
+        <label>密码</label>
+        <input type="password" id="password" placeholder="请输入密码（至少3个字符）">
+
+        <label>确认密码</label>
+        <input type="password" id="confirmPassword" placeholder="再次输入密码">
+
+        <button class="submit-btn" onclick="handleRegister()">注 册</button>
+
+        <div class="login-link">
+            已有账号？<a href="login.html">去登录</a>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 注册逻辑（只负责注册，不包含登录）
+        // ============================================================
+
+        // 获取所有已注册用户
+        function getUsers() {
+            const data = localStorage.getItem('forum_users');
+            return data ? JSON.parse(data) : [];
+        }
+
+        // 保存用户数据
+        function saveUsers(users) {
+            localStorage.setItem('forum_users', JSON.stringify(users));
+        }
+
+        // 显示提示消息
+        function showMsg(text, type) {
+            const box = document.getElementById('msgBox');
+            box.textContent = text;
+            box.className = 'msg ' + type;
+            // 5秒后自动隐藏
+            clearTimeout(box._timer);
+            box._timer = setTimeout(function() {
+                box.className = 'msg';
+            }, 5000);
+        }
+
+        // 注册按钮点击执行
+        function handleRegister() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirm = document.getElementById('confirmPassword').value.trim();
+
+            // ---- 验证 ----
+            if (!username) {
+                showMsg('❌ 请输入账号名！', 'error');
+                document.getElementById('username').focus();
+                return;
+            }
+            if (username.length < 2) {
+                showMsg('❌ 账号名至少2个字符！', 'error');
+                document.getElementById('username').focus();
+                return;
+            }
+            if (!password) {
+                showMsg('❌ 请输入密码！', 'error');
+                document.getElementById('password').focus();
+                return;
+            }
+            if (password.length < 3) {
+                showMsg('❌ 密码至少3个字符！', 'error');
+                document.getElementById('password').focus();
+                return;
+            }
+            if (password !== confirm) {
+                showMsg('❌ 两次输入的密码不一致！', 'error');
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+
+            // ---- 检查账号是否已存在 ----
+            const users = getUsers();
+            if (users.find(u => u.username === username)) {
+                showMsg('❌ 该账号已存在，请直接去登录！', 'error');
+                document.getElementById('username').focus();
+                return;
+            }
+
+            // ---- 保存新用户 ----
+            users.push({
+                username: username,
+                password: password
+            });
+            saveUsers(users);
+
+            // ---- 注册成功 ----
+            showMsg('✅ 注册成功！3秒后跳转到登录页...', 'success');
+
+            // 清空表单
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            // 3秒后跳转到登录页
+            setTimeout(function() {
+                window.location.href = 'login.html';
+            }, 3000);
+        }
+
+        // ===== 按回车键快捷操作 =====
+        document.getElementById('username').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('confirmPassword').focus();
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                handleRegister();
+            }
+        });
+
+        console.log('📝 注册页面已加载！');
+        console.log('📌 已有账号：' + getUsers().map(u => u.username).join(', '));
+    </script>
+
+</body>
+</html>
