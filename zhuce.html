@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <title>注册 - 自制网</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="f367139a310e1799e2e4520bc9406afec214a361.png" type="image/png">
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +20,6 @@
             align-items: center;
         }
 
-        /* ===== 注册卡片 ===== */
         .register-box {
             background: #ffffff;
             border-radius: 20px;
@@ -134,10 +131,8 @@
         <h1>📝 注册账号</h1>
         <p class="subtitle">创建你的论坛账号</p>
 
-        <!-- 提示消息 -->
         <div class="msg" id="msgBox"></div>
 
-        <!-- 表单 -->
         <label>账号名</label>
         <input type="text" id="username" placeholder="请输入账号名（至少2个字符）">
 
@@ -155,34 +150,32 @@
     </div>
 
     <script>
-        // ============================================================
-        // 注册逻辑（只负责注册，不包含登录）
-        // ============================================================
-
-        // 获取所有已注册用户
+        // ===== 获取所有用户 =====
         function getUsers() {
             const data = localStorage.getItem('forum_users');
-            return data ? JSON.parse(data) : [];
+            if (data) {
+                return JSON.parse(data);
+            }
+            return [];
         }
 
-        // 保存用户数据
+        // ===== 保存用户 =====
         function saveUsers(users) {
             localStorage.setItem('forum_users', JSON.stringify(users));
         }
 
-        // 显示提示消息
+        // ===== 显示消息 =====
         function showMsg(text, type) {
             const box = document.getElementById('msgBox');
             box.textContent = text;
             box.className = 'msg ' + type;
-            // 5秒后自动隐藏
             clearTimeout(box._timer);
             box._timer = setTimeout(function() {
                 box.className = 'msg';
             }, 5000);
         }
 
-        // 注册按钮点击执行
+        // ===== 注册逻辑 =====
         function handleRegister() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -215,15 +208,19 @@
                 return;
             }
 
-            // ---- 检查账号是否已存在 ----
+            // ---- ⭐ 关键修复：检查账号是否已存在 ----
             const users = getUsers();
-            if (users.find(u => u.username === username)) {
-                showMsg('❌ 该账号已存在，请直接去登录！', 'error');
-                document.getElementById('username').focus();
-                return;
+
+            // 遍历所有用户，检查用户名是否已被注册
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].username === username) {
+                    showMsg('❌ 该账号已被注册，请直接去登录！', 'error');
+                    document.getElementById('username').focus();
+                    return;
+                }
             }
 
-            // ---- 保存新用户 ----
+            // ---- 注册新用户 ----
             users.push({
                 username: username,
                 password: password
@@ -238,13 +235,13 @@
             document.getElementById('password').value = '';
             document.getElementById('confirmPassword').value = '';
 
-            // 3秒后跳转到登录页
+            // 3秒后跳转登录页
             setTimeout(function() {
                 window.location.href = 'login.html';
             }, 3000);
         }
 
-        // ===== 按回车键快捷操作 =====
+        // ===== 回车键快捷操作 =====
         document.getElementById('username').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('password').focus();
@@ -264,7 +261,7 @@
         });
 
         console.log('📝 注册页面已加载！');
-        console.log('📌 已有账号：' + getUsers().map(u => u.username).join(', '));
+        console.log('📌 已有账号：' + getUsers().map(function(u) { return u.username; }).join(', '));
     </script>
 
 </body>
