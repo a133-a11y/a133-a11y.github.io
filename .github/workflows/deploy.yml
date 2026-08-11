@@ -19,7 +19,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 生成 config.js（从 Secrets 读取）
+      - name: 生成 config.js
         run: |
           echo "const CONFIG = {" > config.js
           echo "    GITHUB_TOKEN: '${{ secrets.MY_GITHUB_TOKEN }}'," >> config.js
@@ -30,16 +30,13 @@ jobs:
           echo "    SECRET_KEY: '${{ secrets.MY_SECRET_KEY }}'" >> config.js
           echo "};" >> config.js
 
-      - name: 准备部署文件
+      - name: 准备部署目录
         run: |
-          mkdir public
-          cp *.html public/ 2>/dev/null || true
-          cp *.json public/ 2>/dev/null || true
-          cp config.js public/
-          cp -r assets public/ 2>/dev/null || true
-          cp -r css public/ 2>/dev/null || true
-          cp -r js public/ 2>/dev/null || true
-          # 如果你有其他文件夹，也复制进去
+          mkdir -p public
+          cp *.html public/ || true
+          cp *.json public/ || true
+          cp config.js public/ || true
+          # 如果你有其他资源文件，按需添加
 
       - name: 上传 Pages 产物
         uses: actions/upload-pages-artifact@v3
