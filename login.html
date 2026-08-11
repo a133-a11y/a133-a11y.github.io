@@ -5,13 +5,19 @@
     <title>登录 - 自制网</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="f367139a310e1799e2e4520bc9406afec214a361.png" type="image/png">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js">
+    </script>
+
+    <!-- ===== 引入 config.js（本地文件，不上传） ===== -->
+    <script src="config.js"></script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: linear-gradient(135deg, #1a2a3a, #2c3e50);
             font-family: "微软雅黑", sans-serif;
@@ -20,7 +26,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .login-box {
             background: #ffffff;
             border-radius: 20px;
@@ -29,21 +34,18 @@
             max-width: 92%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         }
-
         .login-box h1 {
             text-align: center;
             color: #2c3e50;
             font-size: 28px;
             margin-bottom: 6px;
         }
-
         .login-box .subtitle {
             text-align: center;
             color: #888;
             font-size: 14px;
             margin-bottom: 25px;
         }
-
         .login-box label {
             display: block;
             font-weight: 600;
@@ -51,7 +53,6 @@
             margin-bottom: 5px;
             font-size: 14px;
         }
-
         .login-box input {
             width: 100%;
             padding: 12px 16px;
@@ -62,12 +63,10 @@
             transition: border-color 0.3s;
             margin-bottom: 18px;
         }
-
         .login-box input:focus {
             outline: none;
             border-color: #2c3e50;
         }
-
         .login-box .submit-btn {
             width: 100%;
             padding: 14px;
@@ -81,28 +80,23 @@
             font-family: inherit;
             transition: background 0.3s;
         }
-
         .login-box .submit-btn:hover {
             background: #1a2a3a;
         }
-
         .login-box .register-link {
             text-align: center;
             margin-top: 18px;
             color: #888;
             font-size: 14px;
         }
-
         .login-box .register-link a {
             color: #2c3e50;
             text-decoration: none;
             font-weight: 600;
         }
-
         .login-box .register-link a:hover {
             text-decoration: underline;
         }
-
         .msg {
             padding: 10px 14px;
             border-radius: 8px;
@@ -110,19 +104,26 @@
             font-size: 14px;
             display: none;
         }
-
         .msg.error {
             display: block;
             background: #ffebee;
             color: #c62828;
             border: 1px solid #ef9a9a;
         }
-
         .msg.success {
             display: block;
             background: #e8f5e9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #2c3e50;
+            padding: 10px;
+        }
+        .loading.show {
+            display: block;
         }
     </style>
 </head>
@@ -130,9 +131,10 @@
 
     <div class="login-box">
         <h1>🔐 登录</h1>
-        <p class="subtitle">登录你的论坛账号</p>
+        <p class="subtitle">登录你的论坛账号（数据来自 GitHub）</p>
 
         <div class="msg" id="msgBox"></div>
+        <div class="loading" id="loading">⏳ 验证中...</div>
 
         <label>账号名</label>
         <input type="text" id="username" placeholder="请输入账号名">
@@ -143,18 +145,69 @@
         <button class="submit-btn" onclick="handleLogin()">登 录</button>
 
         <div class="register-link">
-            还没有账号？<a href="register.html">去注册</a>
+            还没有账号？<a href="zhuce.html">去注册</a>
         </div>
     </div>
 
     <script>
-        function getUsers() {
-            const data = localStorage.getItem('forum_users');
-            return data ? JSON.parse(data) : [];
+        // ============================================================
+        // 从 config.js 读取配置
+        // ============================================================
+        var GITHUB_TOKEN = CONFIG.GITHUB_TOKEN;
+        var GITHUB_USER = CONFIG.GITHUB_USER;
+        var GITHUB_REPO = CONFIG.GITHUB_REPO;
+        var USERS_FILE = CONFIG.USERS_FILE;
+        var SECRET_KEY = CONFIG.SECRET_KEY;
+
+        // ============================================================
+        // 解密函数
+        // ============================================================
+        function decryptData(ciphertext) {
+            try {
+                var bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (e) {
+                return null;
+            }
         }
 
+        // ============================================================
+        // 从 GitHub 读取 users.json
+        // ============================================================
+        function fetchUsersFromGitHub() {
+            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + USERS_FILE;
+
+            return fetch(url, {
+                headers: {
+                    'Authorization': 'token ' + GITHUB_TOKEN,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        throw new Error('还没有注册的账号，请先去注册！');
+                    }
+                    throw new Error('读取失败: ' + res.status);
+                }
+                return res.json();
+            })
+            .then(function(data) {
+                var content = atob(data.content);
+                var decrypted = decryptData(content);
+                if (decrypted) {
+                    return JSON.parse(decrypted);
+                } else {
+                    throw new Error('数据解析失败，请联系管理员');
+                }
+            });
+        }
+
+        // ============================================================
+        // 显示消息
+        // ============================================================
         function showMsg(text, type) {
-            const box = document.getElementById('msgBox');
+            var box = document.getElementById('msgBox');
             box.textContent = text;
             box.className = 'msg ' + type;
             clearTimeout(box._timer);
@@ -163,9 +216,21 @@
             }, 5000);
         }
 
+        function showLoading(show) {
+            var el = document.getElementById('loading');
+            if (show) {
+                el.classList.add('show');
+            } else {
+                el.classList.remove('show');
+            }
+        }
+
+        // ============================================================
+        // 登录逻辑
+        // ============================================================
         function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value.trim();
 
             if (!username) {
                 showMsg('❌ 请输入账号名！', 'error');
@@ -178,35 +243,59 @@
                 return;
             }
 
-            const users = getUsers();
-            const found = users.find(u => u.username === username && u.password === password);
+            showLoading(true);
+            showMsg('⏳ 正在验证...', 'success');
 
-            if (found) {
-                // 保存登录状态
-                localStorage.setItem('forum_current_user', username);
-                showMsg('✅ 登录成功！3秒后跳转到论坛...', 'success');
-                setTimeout(function() {
-                    window.location.href = 'luntan.html';
-                }, 3000);
-            } else {
-                const exists = users.find(u => u.username === username);
-                if (exists) {
-                    showMsg('❌ 密码错误！', 'error');
-                } else {
-                    showMsg('❌ 账号不存在，请先注册！', 'error');
+            fetchUsersFromGitHub()
+            .then(function(data) {
+                var users = data.users || [];
+                var found = null;
+                for (var i = 0; i < users.length; i++) {
+                    if (users[i].username === username && users[i].password === password) {
+                        found = users[i];
+                        break;
+                    }
                 }
-                document.getElementById('password').focus();
-            }
+
+                if (found) {
+                    localStorage.setItem('forum_current_user', username);
+                    showLoading(false);
+                    showMsg('✅ 登录成功！3秒后跳转到论坛...', 'success');
+                    setTimeout(function() {
+                        window.location.href = 'luntan.html';
+                    }, 3000);
+                } else {
+                    showLoading(false);
+                    var exists = false;
+                    for (var j = 0; j < users.length; j++) {
+                        if (users[j].username === username) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (exists) {
+                        showMsg('❌ 密码错误！', 'error');
+                    } else {
+                        showMsg('❌ 账号不存在，请先注册！', 'error');
+                    }
+                    document.getElementById('password').focus();
+                }
+            })
+            .catch(function(err) {
+                showLoading(false);
+                showMsg('❌ ' + err.message, 'error');
+                console.error(err);
+            });
         }
 
-        document.getElementById('password').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') handleLogin();
-        });
         document.getElementById('username').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') document.getElementById('password').focus();
         });
+        document.getElementById('password').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') handleLogin();
+        });
 
-        console.log('🔐 登录页面已加载！');
+        console.log('🔐 登录页面已加载（GitHub 读取版）');
     </script>
 
 </body>
