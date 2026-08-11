@@ -1,17 +1,25 @@
-name: 部署时生成 config.js
+name: Deploy with Config
 
 on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 用 Secrets 生成 config.js
+      - name: 生成 config.js（从 Secrets 读取）
         run: |
           echo "const CONFIG = {" > config.js
           echo "    GITHUB_TOKEN: '${{ secrets.MY_GITHUB_TOKEN }}'," >> config.js
@@ -22,10 +30,22 @@ jobs:
           echo "    SECRET_KEY: '${{ secrets.MY_SECRET_KEY }}'" >> config.js
           echo "};" >> config.js
 
-      - name: 提交 config.js 到仓库
+      - name: 准备部署文件
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add config.js
-          git commit -m "更新 config.js（由 Actions 生成）" || echo "没有变化"
-          git push
+          mkdir public
+          cp *.html public/ 2>/dev/null || true
+          cp *.json public/ 2>/dev/null || true
+          cp config.js public/
+          cp -r assets public/ 2>/dev/null || true
+          cp -r css public/ 2>/dev/null || true
+          cp -r js public/ 2>/dev/null || true
+          # 如果你有其他文件夹，也复制进去
+
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
