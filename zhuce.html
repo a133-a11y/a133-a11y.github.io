@@ -4,7 +4,14 @@
     <meta charset="utf-8">
     <title>注册 - 自制网</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="f367139a310e1799e2e4520bc9406afec214a361.png" type="image/png">
+    <link rel="icon" href="f367139a310e1799e2e4520bc9406afec214a361.png" type="image/png">
+
+    <!-- ===== 引入 CryptoJS 加密库 ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js">
+    </script>
+
+    <!-- ===== 引入 config.js（本地文件，不上传） ===== -->
+    <script src="config.js"></script>
 
     <style>
         * {
@@ -12,7 +19,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: linear-gradient(135deg, #1a2a3a, #2c3e50);
             font-family: "微软雅黑", sans-serif;
@@ -21,7 +27,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .register-box {
             background: #ffffff;
             border-radius: 20px;
@@ -30,21 +35,18 @@
             max-width: 92%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         }
-
         .register-box h1 {
             text-align: center;
             color: #2c3e50;
             font-size: 28px;
             margin-bottom: 6px;
         }
-
         .register-box .subtitle {
             text-align: center;
             color: #888;
             font-size: 14px;
             margin-bottom: 25px;
         }
-
         .register-box label {
             display: block;
             font-weight: 600;
@@ -52,7 +54,6 @@
             margin-bottom: 5px;
             font-size: 14px;
         }
-
         .register-box input {
             width: 100%;
             padding: 12px 16px;
@@ -63,12 +64,10 @@
             transition: border-color 0.3s;
             margin-bottom: 18px;
         }
-
         .register-box input:focus {
             outline: none;
             border-color: #2c3e50;
         }
-
         .register-box .submit-btn {
             width: 100%;
             padding: 14px;
@@ -82,28 +81,23 @@
             font-family: inherit;
             transition: background 0.3s;
         }
-
         .register-box .submit-btn:hover {
             background: #1a2a3a;
         }
-
         .register-box .login-link {
             text-align: center;
             margin-top: 18px;
             color: #888;
             font-size: 14px;
         }
-
         .register-box .login-link a {
             color: #2c3e50;
             text-decoration: none;
             font-weight: 600;
         }
-
         .register-box .login-link a:hover {
             text-decoration: underline;
         }
-
         .msg {
             padding: 10px 14px;
             border-radius: 8px;
@@ -111,19 +105,26 @@
             font-size: 14px;
             display: none;
         }
-
         .msg.error {
             display: block;
             background: #ffebee;
             color: #c62828;
             border: 1px solid #ef9a9a;
         }
-
         .msg.success {
             display: block;
             background: #e8f5e9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #2c3e50;
+            padding: 10px;
+        }
+        .loading.show {
+            display: block;
         }
     </style>
 </head>
@@ -131,9 +132,10 @@
 
     <div class="register-box">
         <h1>📝 注册账号</h1>
-        <p class="subtitle">创建你的论坛账号</p>
+        <p class="subtitle">账号数据加密后存入 GitHub 仓库</p>
 
         <div class="msg" id="msgBox"></div>
+        <div class="loading" id="loading">⏳ 提交中...</div>
 
         <label>账号名</label>
         <input type="text" id="username" placeholder="请输入账号名（至少2个字符）">
@@ -152,23 +154,122 @@
     </div>
 
     <script>
-        // ===== 获取所有用户 =====
-        function getUsers() {
-            const data = localStorage.getItem('forum_users');
-            if (data) {
-                return JSON.parse(data);
+        // ============================================================
+        // 从 config.js 读取配置
+        // ============================================================
+        var GITHUB_TOKEN = CONFIG.GITHUB_TOKEN;
+        var GITHUB_USER = CONFIG.GITHUB_USER;
+        var GITHUB_REPO = CONFIG.GITHUB_REPO;
+        var USERS_FILE = CONFIG.USERS_FILE;
+        var SECRET_KEY = CONFIG.SECRET_KEY;
+
+        // ============================================================
+        // 加密 / 解密 函数
+        // ============================================================
+        function encryptData(plaintext) {
+            return CryptoJS.AES.encrypt(plaintext, SECRET_KEY).toString();
+        }
+
+        function decryptData(ciphertext) {
+            try {
+                var bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (e) {
+                return null;
             }
-            return [];
         }
 
-        // ===== 保存用户 =====
-        function saveUsers(users) {
-            localStorage.setItem('forum_users', JSON.stringify(users));
+        // ============================================================
+        // 从 GitHub 读取 users.json
+        // ============================================================
+        function fetchUsersFromGitHub() {
+            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + USERS_FILE;
+
+            return fetch(url, {
+                headers: {
+                    'Authorization': 'token ' + GITHUB_TOKEN,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        return { users: [] };
+                    }
+                    throw new Error('读取失败: ' + res.status);
+                }
+                return res.json();
+            })
+            .then(function(data) {
+                var content = atob(data.content);
+                var decrypted = decryptData(content);
+                if (decrypted) {
+                    return JSON.parse(decrypted);
+                } else {
+                    return { users: [] };
+                }
+            })
+            .catch(function(err) {
+                console.error('读取用户数据失败:', err);
+                return { users: [] };
+            });
         }
 
-        // ===== 显示消息 =====
+        // ============================================================
+        // 写入 users.json 到 GitHub
+        // ============================================================
+        function saveUsersToGitHub(usersData) {
+            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + USERS_FILE;
+
+            var encrypted = encryptData(JSON.stringify(usersData));
+
+            return fetch(url, {
+                headers: {
+                    'Authorization': 'token ' + GITHUB_TOKEN,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(function(res) {
+                if (res.status === 404) {
+                    return { sha: null };
+                }
+                return res.json();
+            })
+            .then(function(fileInfo) {
+                var payload = {
+                    message: '更新用户数据',
+                    content: btoa(encrypted),
+                    branch: 'main'
+                };
+                if (fileInfo.sha) {
+                    payload.sha = fileInfo.sha;
+                }
+
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + GITHUB_TOKEN,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    return res.json().then(function(err) {
+                        throw new Error('写入失败: ' + JSON.stringify(err));
+                    });
+                }
+                return res.json();
+            });
+        }
+
+        // ============================================================
+        // 显示消息
+        // ============================================================
         function showMsg(text, type) {
-            const box = document.getElementById('msgBox');
+            var box = document.getElementById('msgBox');
             box.textContent = text;
             box.className = 'msg ' + type;
             clearTimeout(box._timer);
@@ -177,13 +278,23 @@
             }, 5000);
         }
 
-        // ===== 注册逻辑 =====
-        function handleRegister() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const confirm = document.getElementById('confirmPassword').value.trim();
+        function showLoading(show) {
+            var el = document.getElementById('loading');
+            if (show) {
+                el.classList.add('show');
+            } else {
+                el.classList.remove('show');
+            }
+        }
 
-            // ---- 验证 ----
+        // ============================================================
+        // 注册逻辑
+        // ============================================================
+        function handleRegister() {
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value.trim();
+            var confirm = document.getElementById('confirmPassword').value.trim();
+
             if (!username) {
                 showMsg('❌ 请输入账号名！', 'error');
                 document.getElementById('username').focus();
@@ -210,60 +321,56 @@
                 return;
             }
 
-            // ---- ⭐ 关键修复：检查账号是否已存在 ----
-            const users = getUsers();
+            showLoading(true);
+            showMsg('⏳ 正在提交到 GitHub...', 'success');
 
-            // 遍历所有用户，检查用户名是否已被注册
-            for (var i = 0; i < users.length; i++) {
-                if (users[i].username === username) {
-                    showMsg('❌ 该账号已被注册，请直接去登录！', 'error');
-                    document.getElementById('username').focus();
-                    return;
+            fetchUsersFromGitHub()
+            .then(function(data) {
+                var users = data.users || [];
+
+                for (var i = 0; i < users.length; i++) {
+                    if (users[i].username === username) {
+                        throw new Error('该账号已被注册，请直接去登录！');
+                    }
                 }
-            }
 
-            // ---- 注册新用户 ----
-            users.push({
-                username: username,
-                password: password
+                users.push({
+                    username: username,
+                    password: password
+                });
+
+                return saveUsersToGitHub({ users: users });
+            })
+            .then(function() {
+                showLoading(false);
+                showMsg('✅ 注册成功！3秒后跳转到登录页...', 'success');
+
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('confirmPassword').value = '';
+
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 3000);
+            })
+            .catch(function(err) {
+                showLoading(false);
+                showMsg('❌ ' + err.message, 'error');
+                console.error(err);
             });
-            saveUsers(users);
-
-            // ---- 注册成功 ----
-            showMsg('✅ 注册成功！3秒后跳转到登录页...', 'success');
-
-            // 清空表单
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('confirmPassword').value = '';
-
-            // 3秒后跳转登录页
-            setTimeout(function() {
-                window.location.href = 'login.html';
-            }, 3000);
         }
 
-        // ===== 回车键快捷操作 =====
         document.getElementById('username').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('password').focus();
-            }
+            if (e.key === 'Enter') document.getElementById('password').focus();
         });
-
         document.getElementById('password').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('confirmPassword').focus();
-            }
+            if (e.key === 'Enter') document.getElementById('confirmPassword').focus();
         });
-
         document.getElementById('confirmPassword').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                handleRegister();
-            }
+            if (e.key === 'Enter') handleRegister();
         });
 
-        console.log('📝 注册页面已加载！');
-        console.log('📌 已有账号：' + getUsers().map(function(u) { return u.username; }).join(', '));
+        console.log('📝 注册页面已加载（GitHub 存储版）');
     </script>
 
 </body>
