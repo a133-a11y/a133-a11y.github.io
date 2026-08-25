@@ -1,3 +1,14 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": 1787647396532,
+      "title": "eee",
+      "content": "eeeeeeeeeeeee",
+      "section": "section-general",
+      "author": "guanli",
+      "date": "2026-08-25",
+      "tags": [],
+      "comments": []
+    }
+  ]
 }
