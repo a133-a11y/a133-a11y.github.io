@@ -843,33 +843,7 @@ var POSTS_FILE = 'posts.json';
         // ============================================================
         // 从 GitHub 读取 posts.json
         // ============================================================
-        function fetchPostsFromGitHub() {
-            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
-
-            return fetch(url, {
-                headers: {
-                    'Authorization': 'token ' + GITHUB_TOKEN,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            })
-            .then(function(res) {
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        return { posts: [] };
-                    }
-                    throw new Error('读取帖子失败: ' + res.status);
-                }
-                return res.json();
-            })
-            .then(function(data) {
-                var content = atob(data.content);
-                return JSON.parse(content);
-            })
-            .catch(function(err) {
-                console.error('读取帖子失败:', err);
-                return { posts: [] };
-            });
-        }
+v
 
         // ============================================================
         // 写入 posts.json 到 GitHub
