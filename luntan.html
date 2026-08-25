@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>论坛 - 自制网</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="f367139a310e1799e2e4520bc9406afec214a361.png" type="image/png">
     <style>
         /* ===== 全局重置 ===== */
         * {
@@ -262,7 +263,6 @@
             overflow-y: auto;
         }
 
-        /* ===== 发帖按钮 ===== */
         .new-post-btn {
             background-color: #2c3e50;
             color: white;
@@ -303,9 +303,6 @@
             padding: 30px 0;
         }
 
-        /* ============================================================
-           ⭐ 帖子卡片样式（重点在这里）
-           ============================================================ */
         .post-item {
             background-color: #ffffff;
             border-radius: 16px;
@@ -641,7 +638,6 @@
             font-size: 0.95em;
         }
 
-        /* ===== 版块切换 ===== */
         .forum-section {
             display: none;
         }
@@ -650,7 +646,6 @@
             display: block;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 700px) {
             body {
                 flex-direction: column;
@@ -719,10 +714,10 @@
         }
     </style>
     <!-- CryptoJS 加密库 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js">
-</script>
-<!-- config.js（从本地读取，不上传仓库） -->
-<script src="config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js">
+    </script>
+    <!-- config.js（从本地读取，不上传仓库） -->
+    <script src="config.js"></script>
 </head>
 <body>
 
@@ -753,7 +748,7 @@
                 </div>
                 <a href="zhuce.html">注册</a>
                 <a href="login.html">登录</a>
-                <a href="#" onclick="handleAccount(); return false;">👤 账号</a>
+                <a href="#" id="accountLink" onclick="handleAccount()">👤 账号</a>
             </div>
         </nav>
 
@@ -838,36 +833,109 @@
     </div>
 
     <script>
-        // 在页面加载完成后绑定点击事件
-//document.addEventListener('DOMContentLoaded', function() {
-    //const accountLink = document.getElementById('accountLink');
-    //if (accountLink) {
-       // accountLink.addEventListener('click', function(e) {
-        //    e.preventDefault(); // 阻止默认跳转
-           // handleAccount();
-       // });
-  //  }
-//});
-// ============================================================
-// 配置（从 config.js 读取，如果没有就改成实际值）
-// ============================================================
-var GITHUB_TOKEN = CONFIG ? CONFIG.GITHUB_TOKEN : '你的令牌';
-var GITHUB_USER = CONFIG ? CONFIG.GITHUB_USER : 'a133-a11y';
-var GITHUB_REPO = CONFIG ? CONFIG.GITHUB_REPO : 'a133-a11y.github.io';
+        // ============================================================
+        // 配置（从 config.js 读取）
+        // ============================================================
+        var GITHUB_TOKEN = CONFIG.GITHUB_TOKEN;
+var GITHUB_USER = CONFIG.GITHUB_USER;
+var GITHUB_REPO = CONFIG.GITHUB_REPO;
 var POSTS_FILE = 'posts.json';
-        // ===== 侧边栏切换 =====
-        const sidebarButtons = document.querySelectorAll('.sidebar button');
-        const forumSections = document.querySelectorAll('.forum-section');
+        // ============================================================
+        // 从 GitHub 读取 posts.json
+        // ============================================================
+        function fetchPostsFromGitHub() {
+            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
 
-        sidebarButtons.forEach(button => {
+            return fetch(url, {
+                headers: {
+                    'Authorization': 'token ' + GITHUB_TOKEN,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        return { posts: [] };
+                    }
+                    throw new Error('读取帖子失败: ' + res.status);
+                }
+                return res.json();
+            })
+            .then(function(data) {
+                var content = atob(data.content);
+                return JSON.parse(content);
+            })
+            .catch(function(err) {
+                console.error('读取帖子失败:', err);
+                return { posts: [] };
+            });
+        }
+
+        // ============================================================
+        // 写入 posts.json 到 GitHub
+        // ============================================================
+        function savePostsToGitHub(postsData) {
+            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
+
+            var content = JSON.stringify(postsData, null, 2);
+
+            return fetch(url, {
+                headers: {
+                    'Authorization': 'token ' + GITHUB_TOKEN,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(function(res) {
+                if (res.status === 404) {
+                    return { sha: null };
+                }
+                return res.json();
+            })
+            .then(function(fileInfo) {
+                var payload = {
+                    message: '更新帖子',
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    branch: 'main'
+                };
+                if (fileInfo.sha) {
+                    payload.sha = fileInfo.sha;
+                }
+
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + GITHUB_TOKEN,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    return res.json().then(function(err) {
+                        throw new Error('写入失败: ' + JSON.stringify(err));
+                    });
+                }
+                return res.json();
+            });
+        }
+
+        // ============================================================
+        // 侧边栏切换
+        // ============================================================
+        var sidebarButtons = document.querySelectorAll('.sidebar button');
+        var forumSections = document.querySelectorAll('.forum-section');
+
+        sidebarButtons.forEach(function(button) {
             button.addEventListener('click', function() {
-                sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                sidebarButtons.forEach(function(btn) { btn.classList.remove('active'); });
                 this.classList.add('active');
 
-                const targetId = this.getAttribute('data-target');
-                forumSections.forEach(section => section.classList.remove('active'));
+                var targetId = this.getAttribute('data-target');
+                forumSections.forEach(function(section) { section.classList.remove('active'); });
 
-                const targetSection = document.getElementById(targetId);
+                var targetSection = document.getElementById(targetId);
                 if (targetSection) {
                     targetSection.classList.add('active');
                     renderPosts(targetId);
@@ -876,53 +944,59 @@ var POSTS_FILE = 'posts.json';
             });
         });
 
-        // ===== 轮播 =====
-        let currentSlide = 0;
-        const track = document.getElementById('carouselTrack');
-        const slides = document.querySelectorAll('.carousel-slide');
-        const totalSlides = slides.length;
-        const dotsContainer = document.getElementById('carouselDots');
+        // ============================================================
+        // 轮播
+        // ============================================================
+        var currentSlide = 0;
+        var track = document.getElementById('carouselTrack');
+        var slides = document.querySelectorAll('.carousel-slide');
+        var totalSlides = slides.length;
+        var dotsContainer = document.getElementById('carouselDots');
 
-        for (let i = 0; i < totalSlides; i++) {
-            const dot = document.createElement('span');
+        for (var i = 0; i < totalSlides; i++) {
+            var dot = document.createElement('span');
             if (i === 0) dot.classList.add('active');
-            dot.addEventListener('click', function() { goToSlide(i); });
+            dot.addEventListener('click', function(index) {
+                return function() { goToSlide(index); };
+            }(i));
             dotsContainer.appendChild(dot);
         }
 
-        const dots = dotsContainer.querySelectorAll('span');
+        var dots = dotsContainer.querySelectorAll('span');
 
         function goToSlide(index) {
             if (index < 0) index = totalSlides - 1;
             if (index >= totalSlides) index = 0;
             currentSlide = index;
             track.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
-            dots.forEach((dot, i) => {
+            dots.forEach(function(dot, i) {
                 dot.classList.toggle('active', i === currentSlide);
             });
         }
 
         function nextSlide() { goToSlide(currentSlide + 1); }
 
-        let autoPlay = setInterval(nextSlide, 5000);
-        const carouselContainer = document.getElementById('carouselContainer');
+        var autoPlay = setInterval(nextSlide, 5000);
+        var carouselContainer = document.getElementById('carouselContainer');
         carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlay); });
         carouselContainer.addEventListener('mouseleave', function() { autoPlay = setInterval(nextSlide, 5000); });
 
-        // ===== 搜索 =====
+        // ============================================================
+        // 搜索
+        // ============================================================
         function searchPosts() {
-            const input = document.getElementById('searchInput');
-            const keyword = input.value.trim().toLowerCase();
-            const allPosts = document.querySelectorAll('.post-item');
+            var input = document.getElementById('searchInput');
+            var keyword = input.value.trim().toLowerCase();
+            var allPosts = document.querySelectorAll('.post-item');
 
             if (keyword === '') {
-                allPosts.forEach(post => post.style.display = 'flex');
+                allPosts.forEach(function(post) { post.style.display = 'flex'; });
                 return;
             }
 
-            allPosts.forEach(post => {
-                const title = post.querySelector('.title').textContent.toLowerCase();
-                post.style.display = title.includes(keyword) ? 'flex' : 'none';
+            allPosts.forEach(function(post) {
+                var title = post.querySelector('.title').textContent.toLowerCase();
+                post.style.display = title.indexOf(keyword) !== -1 ? 'flex' : 'none';
             });
         }
 
@@ -930,96 +1004,9 @@ var POSTS_FILE = 'posts.json';
             if (e.key === 'Enter') searchPosts();
         });
 
-        // ===== 数据管理 =====
-        function getPosts() {
-            const data = localStorage.getItem('forum_posts');
-            return data ? JSON.parse(data) : [];
-        }
-// ============================================================
-// 从 GitHub 读取 posts.json
-// ============================================================
-function fetchPostsFromGitHub() {
-    var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
-
-    return fetch(url, {
-        headers: {
-            'Authorization': 'token ' + GITHUB_TOKEN,
-            'Accept': 'application/vnd.github.v3+json'
-        }
-    })
-    .then(function(res) {
-        if (!res.ok) {
-            if (res.status === 404) {
-                return { posts: [] };
-            }
-            throw new Error('读取帖子失败: ' + res.status);
-        }
-        return res.json();
-    })
-    .then(function(data) {
-        var content = atob(data.content);
-        return JSON.parse(content);
-    })
-    .catch(function(err) {
-        console.error('读取帖子失败:', err);
-        return { posts: [] };
-    });
-}
-
-// ============================================================
-// 写入 posts.json 到 GitHub
-// ============================================================
-function savePostsToGitHub(postsData) {
-    var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
-
-    var content = JSON.stringify(postsData, null, 2);
-
-    return fetch(url, {
-        headers: {
-            'Authorization': 'token ' + GITHUB_TOKEN,
-            'Accept': 'application/vnd.github.v3+json'
-        }
-    })
-    .then(function(res) {
-        if (res.status === 404) {
-            return { sha: null };
-        }
-        return res.json();
-    })
-    .then(function(fileInfo) {
-        var payload = {
-            message: '更新帖子',
-            content: btoa(unescape(encodeURIComponent(content))),
-            branch: 'main'
-        };
-        if (fileInfo.sha) {
-            payload.sha = fileInfo.sha;
-        }
-
-        return fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'token ' + GITHUB_TOKEN,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-    })
-    .then(function(res) {
-        if (!res.ok) {
-            return res.json().then(function(err) {
-                throw new Error('写入失败: ' + JSON.stringify(err));
-            });
-        }
-        return res.json();
-    });
-}
-        function savePosts(posts) {
-            localStorage.setItem('forum_posts', JSON.stringify(posts));
-        }
-
-        // ===== 发帖功能 =====
+        // ============================================================
+        // 发帖功能
+        // ============================================================
         function openPostModal() {
             document.getElementById('postModal').classList.add('show');
             document.getElementById('postTitle').focus();
@@ -1046,202 +1033,199 @@ function savePostsToGitHub(postsData) {
         });
 
         function submitPost() {
-    // 检查登录状态
-    var currentUser = localStorage.getItem('forum_current_user');
-    if (!currentUser) {
-        alert('⚠️ 请先登录再发帖！');
-        window.location.href = 'login.html';
-        return;
-    }
-
-    var title = document.getElementById('postTitle').value.trim();
-    var sectionId = document.getElementById('postSection').value;
-    var content = document.getElementById('postContent').value.trim();
-    var tagsInput = document.getElementById('postTags').value.trim();
-
-    if (!title) { alert('❌ 请输入帖子标题！'); return; }
-    if (title.length < 2) { alert('❌ 标题至少2个字符！'); return; }
-    if (!content) { alert('❌ 请输入帖子内容！'); return; }
-    if (content.length < 5) { alert('❌ 内容至少5个字符！'); return; }
-
-    var tags = tagsInput ? tagsInput.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }) : [];
-
-    var post = {
-        id: Date.now(),
-        title: title,
-        content: content,
-        section: sectionId,
-        author: currentUser,
-        date: new Date().toISOString().slice(0, 10),
-        tags: tags,
-        comments: []
-    };
-
-    // 从 GitHub 读取现有帖子
-    fetchPostsFromGitHub()
-    .then(function(data) {
-        var posts = data.posts || [];
-        posts.unshift(post);
-        return savePostsToGitHub({ posts: posts });
-    })
-    .then(function() {
-        closePostModal();
-        var activeSection = document.querySelector('.forum-section.active');
-        if (activeSection) {
-            renderPosts(activeSection.id);
-        }
-        alert('✅ 帖子发布成功！');
-    })
-    .catch(function(err) {
-        alert('❌ 发布失败：' + err.message);
-        console.error(err);
-    });
-}
-
-        // ============================================================
-        // ⭐ 核心：渲染帖子（生成卡片）
-        // ============================================================
-        // ============================================================
-// ⭐ 核心：渲染帖子（从 GitHub 读取）
-// ============================================================
-function renderPosts(sectionId) {
-    var section = document.getElementById(sectionId);
-    if (!section) return;
-
-    // 从 GitHub 读取帖子
-    fetchPostsFromGitHub()
-    .then(function(data) {
-        var allPosts = data.posts || [];
-        var sectionPosts = allPosts.filter(function(p) { return p.section === sectionId; });
-
-        // 保留 header
-        var header = section.querySelector('.section-header');
-        section.innerHTML = '';
-
-        if (!header) {
-            header = document.createElement('div');
-            header.className = 'section-header';
-            var h2 = document.createElement('h2');
-            var nameMap = {
-                'section-general': '📋 综合讨论',
-                'section-survival': '⚡ 生电专区',
-                'section-pvp': '⚔️ PVP专区',
-                'section-mod': '🧩 MOD专区'
-            };
-            h2.textContent = nameMap[sectionId] || sectionId;
-            header.appendChild(h2);
-
-            var btn = document.createElement('button');
-            btn.className = 'new-post-btn';
-            btn.textContent = '📝 发帖';
-            btn.onclick = function(e) {
-                e.stopPropagation();
-                document.getElementById('postSection').value = sectionId;
-                openPostModal();
-            };
-
-            // 根据登录状态显示/隐藏发帖按钮
             var currentUser = localStorage.getItem('forum_current_user');
-            btn.style.display = currentUser ? 'inline-block' : 'none';
+            if (!currentUser) {
+                alert('⚠️ 请先登录再发帖！');
+                window.location.href = 'login.html';
+                return;
+            }
 
-            header.appendChild(btn);
+            var title = document.getElementById('postTitle').value.trim();
+            var sectionId = document.getElementById('postSection').value;
+            var content = document.getElementById('postContent').value.trim();
+            var tagsInput = document.getElementById('postTags').value.trim();
+
+            if (!title) { alert('❌ 请输入帖子标题！'); return; }
+            if (title.length < 2) { alert('❌ 标题至少2个字符！'); return; }
+            if (!content) { alert('❌ 请输入帖子内容！'); return; }
+            if (content.length < 5) { alert('❌ 内容至少5个字符！'); return; }
+
+            var tags = tagsInput ? tagsInput.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }) : [];
+
+            var post = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                section: sectionId,
+                author: currentUser,
+                date: new Date().toISOString().slice(0, 10),
+                tags: tags,
+                comments: []
+            };
+
+            fetchPostsFromGitHub()
+            .then(function(data) {
+                var posts = data.posts || [];
+                posts.unshift(post);
+                return savePostsToGitHub({ posts: posts });
+            })
+            .then(function() {
+                closePostModal();
+                var activeSection = document.querySelector('.forum-section.active');
+                if (activeSection) {
+                    renderPosts(activeSection.id);
+                }
+                alert('✅ 帖子发布成功！');
+            })
+            .catch(function(err) {
+                alert('❌ 发布失败：' + err.message);
+                console.error(err);
+            });
         }
-        section.appendChild(header);
 
-        if (sectionPosts.length === 0) {
-            var empty = document.createElement('div');
-            empty.className = 'empty-posts';
-            empty.textContent = '📭 还没有帖子，快来发布第一个吧！';
-            section.appendChild(empty);
-            return;
-        }
+        // ============================================================
+        // 渲染帖子（从 GitHub 读取）
+        // ============================================================
+        function renderPosts(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (!section) return;
 
-       
-}
-            // 生成卡片
-            sectionPosts.forEach(function(post) {
-                const item = document.createElement('div');
-                item.className = 'post-item';
-                item.style.cursor = 'pointer';
+            fetchPostsFromGitHub()
+            .then(function(data) {
+                var allPosts = data.posts || [];
+                var sectionPosts = allPosts.filter(function(p) { return p.section === sectionId; });
 
-                item.addEventListener('click', function() {
-                    openDetail(post.id);
-                });
+                var header = section.querySelector('.section-header');
+                section.innerHTML = '';
 
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'title';
-                titleDiv.textContent = post.title;
-                item.appendChild(titleDiv);
+                if (!header) {
+                    header = document.createElement('div');
+                    header.className = 'section-header';
+                    var h2 = document.createElement('h2');
+                    var nameMap = {
+                        'section-general': '📋 综合讨论',
+                        'section-survival': '⚡ 生电专区',
+                        'section-pvp': '⚔️ PVP专区',
+                        'section-mod': '🧩 MOD专区'
+                    };
+                    h2.textContent = nameMap[sectionId] || sectionId;
+                    header.appendChild(h2);
 
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'content-preview';
-                contentDiv.textContent = post.content.length > 60 ? post.content.slice(0, 60) + '...' : post.content;
-                item.appendChild(contentDiv);
+                    var btn = document.createElement('button');
+                    btn.className = 'new-post-btn';
+                    btn.textContent = '📝 发帖';
+                    btn.onclick = function(e) {
+                        e.stopPropagation();
+                        document.getElementById('postSection').value = sectionId;
+                        openPostModal();
+                    };
 
-                const meta = document.createElement('div');
-                meta.className = 'meta';
-                const commentCount = (post.comments ? post.comments.length : 0);
-                meta.innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
-                item.appendChild(meta);
+                    var currentUser = localStorage.getItem('forum_current_user');
+                    btn.style.display = currentUser ? 'inline-block' : 'none';
 
-                if (post.tags && post.tags.length > 0) {
-                    const tagsDiv = document.createElement('div');
-                    tagsDiv.className = 'tags';
-                    post.tags.forEach(function(tag) {
-                        const span = document.createElement('span');
-                        span.className = 'tag';
-                        span.textContent = tag;
-                        tagsDiv.appendChild(span);
-                    });
-                    item.appendChild(tagsDiv);
+                    header.appendChild(btn);
+                }
+                section.appendChild(header);
+
+                if (sectionPosts.length === 0) {
+                    var empty = document.createElement('div');
+                    empty.className = 'empty-posts';
+                    empty.textContent = '📭 还没有帖子，快来发布第一个吧！';
+                    section.appendChild(empty);
+                    return;
                 }
 
-                section.appendChild(item);
+                sectionPosts.forEach(function(post) {
+                    var item = document.createElement('div');
+                    item.className = 'post-item';
+                    item.style.cursor = 'pointer';
+
+                    item.addEventListener('click', function() {
+                        openDetail(post.id);
+                    });
+
+                    var titleDiv = document.createElement('div');
+                    titleDiv.className = 'title';
+                    titleDiv.textContent = post.title;
+                    item.appendChild(titleDiv);
+
+                    var contentDiv = document.createElement('div');
+                    contentDiv.className = 'content-preview';
+                    contentDiv.textContent = post.content.length > 60 ? post.content.slice(0, 60) + '...' : post.content;
+                    item.appendChild(contentDiv);
+
+                    var meta = document.createElement('div');
+                    meta.className = 'meta';
+                    var commentCount = (post.comments ? post.comments.length : 0);
+                    meta.innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+                    item.appendChild(meta);
+
+                    if (post.tags && post.tags.length > 0) {
+                        var tagsDiv = document.createElement('div');
+                        tagsDiv.className = 'tags';
+                        post.tags.forEach(function(tag) {
+                            var span = document.createElement('span');
+                            span.className = 'tag';
+                            span.textContent = tag;
+                            tagsDiv.appendChild(span);
+                        });
+                        item.appendChild(tagsDiv);
+                    }
+
+                    section.appendChild(item);
+                });
+            })
+            .catch(function(err) {
+                console.error('加载帖子失败:', err);
+                section.innerHTML = '<p style="color:red; padding:20px;">加载帖子失败，请刷新重试</p>';
             });
         }
 
-        // ===== 详情 & 评论 =====
-        let currentPostId = null;
+        // ============================================================
+        // 详情 & 评论
+        // ============================================================
+        var currentPostId = null;
 
         function openDetail(postId) {
-    // 从 GitHub 读取帖子
-    fetchPostsFromGitHub()
-    .then(function(posts) {
-        var post = null;
-        for (var i = 0; i < posts.posts.length; i++) {
-            if (posts.posts[i].id === postId) {
-                post = posts.posts[i];
-                break;
-            }
-        }
-        if (!post) { alert('帖子不存在'); return; }
+            fetchPostsFromGitHub()
+            .then(function(data) {
+                var posts = data.posts || [];
+                var post = null;
+                for (var i = 0; i < posts.length; i++) {
+                    if (posts[i].id === postId) {
+                        post = posts[i];
+                        break;
+                    }
+                }
+                if (!post) { alert('帖子不存在'); return; }
 
-        currentPostId = postId;
-        document.getElementById('detailTitle').textContent = post.title;
-        var commentCount = (post.comments ? post.comments.length : 0);
-        document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
-        document.getElementById('detailContent').textContent = post.content;
+                currentPostId = postId;
+                document.getElementById('detailTitle').textContent = post.title;
+                var commentCount = (post.comments ? post.comments.length : 0);
+                document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+                document.getElementById('detailContent').textContent = post.content;
 
-        var tagsContainer = document.getElementById('detailTags');
-        tagsContainer.innerHTML = '';
-        if (post.tags && post.tags.length > 0) {
-            post.tags.forEach(function(tag) {
-                var span = document.createElement('span');
-                span.className = 'tag';
-                span.textContent = tag;
-                tagsContainer.appendChild(span);
+                var tagsContainer = document.getElementById('detailTags');
+                tagsContainer.innerHTML = '';
+                if (post.tags && post.tags.length > 0) {
+                    post.tags.forEach(function(tag) {
+                        var span = document.createElement('span');
+                        span.className = 'tag';
+                        span.textContent = tag;
+                        tagsContainer.appendChild(span);
+                    });
+                }
+
+                renderComments(post);
+                document.getElementById('detailModal').classList.add('show');
+                document.getElementById('commentInput').focus();
+            })
+            .catch(function(err) {
+                console.error('加载帖子详情失败:', err);
+                alert('加载帖子失败，请刷新重试');
             });
         }
 
-        renderComments(post);
-        document.getElementById('detailModal').classList.add('show');
-        document.getElementById('commentInput').focus();
-    })
-    .catch(function(err) {
-        console.error('加载帖子详情失败:', err);
-        alert('加载帖子失败，请刷新重试');
-    });
-}
         function closeDetail() {
             document.getElementById('detailModal').classList.remove('show');
             currentPostId = null;
@@ -1252,9 +1236,9 @@ function renderPosts(sectionId) {
         });
 
         function renderComments(post) {
-            const list = document.getElementById('commentList');
-            const count = document.getElementById('commentCount');
-            const comments = post.comments || [];
+            var list = document.getElementById('commentList');
+            var count = document.getElementById('commentCount');
+            var comments = post.comments || [];
             count.textContent = comments.length;
 
             if (comments.length === 0) {
@@ -1264,7 +1248,7 @@ function renderPosts(sectionId) {
 
             list.innerHTML = '';
             comments.forEach(function(comment, index) {
-                const item = document.createElement('div');
+                var item = document.createElement('div');
                 item.className = 'comment-item';
                 item.innerHTML = '<div class="comment-meta"><span>👤 ' + comment.author + '</span><span>📅 ' + comment.date + '</span><span>#' + (index + 1) + '</span></div><div class="comment-text">' + escapeHtml(comment.text) + '</div>';
                 list.appendChild(item);
@@ -1272,92 +1256,103 @@ function renderPosts(sectionId) {
         }
 
         function submitComment() {
-    var input = document.getElementById('commentInput');
-    var text = input.value.trim();
-    if (!text) { alert('请输入评论内容！'); return; }
-    if (text.length < 2) { alert('评论至少2个字符！'); return; }
-    if (!currentPostId) { alert('请先打开一个帖子！'); return; }
+            var input = document.getElementById('commentInput');
+            var text = input.value.trim();
+            if (!text) { alert('请输入评论内容！'); return; }
+            if (text.length < 2) { alert('评论至少2个字符！'); return; }
+            if (!currentPostId) { alert('请先打开一个帖子！'); return; }
 
-    var username = localStorage.getItem('forum_current_user') || '匿名玩家';
+            var username = localStorage.getItem('forum_current_user') || '匿名玩家';
 
-    fetchPostsFromGitHub()
-    .then(function(data) {
-        var posts = data.posts || [];
-        var post = null;
-        for (var i = 0; i < posts.length; i++) {
-            if (posts[i].id === currentPostId) {
-                post = posts[i];
-                break;
-            }
+            fetchPostsFromGitHub()
+            .then(function(data) {
+                var posts = data.posts || [];
+                var post = null;
+                for (var i = 0; i < posts.length; i++) {
+                    if (posts[i].id === currentPostId) {
+                        post = posts[i];
+                        break;
+                    }
+                }
+                if (!post) { alert('帖子已不存在'); return; }
+
+                if (!post.comments) post.comments = [];
+                post.comments.push({
+                    author: username,
+                    text: text,
+                    date: new Date().toISOString().slice(0, 10)
+                });
+                post.replies = post.comments.length;
+
+                for (var j = 0; j < posts.length; j++) {
+                    if (posts[j].id === currentPostId) {
+                        posts[j] = post;
+                        break;
+                    }
+                }
+
+                return savePostsToGitHub({ posts: posts });
+            })
+            .then(function() {
+                input.value = '';
+                openDetail(currentPostId);
+                var activeSection = document.querySelector('.forum-section.active');
+                if (activeSection) {
+                    renderPosts(activeSection.id);
+                }
+            })
+            .catch(function(err) {
+                console.error('评论失败:', err);
+                alert('评论失败，请重试');
+            });
         }
-        if (!post) { alert('帖子已不存在'); return; }
 
-        if (!post.comments) post.comments = [];
-        post.comments.push({ 
-            author: username, 
-            text: text, 
-            date: new Date().toISOString().slice(0, 10) 
+        document.getElementById('commentInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') submitComment();
         });
-        post.replies = post.comments.length;
 
-        // 更新 posts 数组中的对应帖子
-        for (var j = 0; j < posts.length; j++) {
-            if (posts[j].id === currentPostId) {
-                posts[j] = post;
-                break;
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // 账号按钮
+        // ============================================================
+        function handleAccount() {
+            var currentUser = localStorage.getItem('forum_current_user');
+
+            if (currentUser) {
+                if (confirm('当前登录：' + currentUser + '\n\n点击"确定"退出登录')) {
+                    localStorage.removeItem('forum_current_user');
+                    alert('✅ 已退出登录');
+                    location.reload();
+                }
+            } else {
+                window.location.href = 'login.html';
             }
         }
 
-        return savePostsToGitHub({ posts: posts });
-    })
-    .then(function() {
-        input.value = '';
-        // 重新加载帖子详情刷新评论
-        openDetail(currentPostId);
-        // 刷新帖子列表
-        var activeSection = document.querySelector('.forum-section.active');
-        if (activeSection) {
-            renderPosts(activeSection.id);
+        function updateAccountBtn() {
+            var accountLink = document.getElementById('accountLink');
+            var currentUser = localStorage.getItem('forum_current_user');
+            if (accountLink) {
+                accountLink.textContent = currentUser ? '👤 ' + currentUser : '👤 账号';
+            }
         }
-    })
-    .catch(function(err) {
-        console.error('评论失败:', err);
-        alert('评论失败，请重试');
-    });
-}
-// ============================================================
-// 账号按钮：显示当前登录用户，询问是否退出
-// ============================================================
-function handleAccount() {
-    const currentUser = localStorage.getItem('forum_current_user');
 
-    if (currentUser) {
-        if (confirm('当前登录：' + currentUser + '\n\n点击"确定"退出登录')) {
-            localStorage.removeItem('forum_current_user');
-            alert('✅ 已退出登录');
-            location.reload();
-        }
-    } else {
-        window.location.href = 'login.html';
-    }
-}
-
-function updateAccountBtn() {
-    const accountLink = document.getElementById('accountLink');
-    const currentUser = localStorage.getItem('forum_current_user');
-    if (accountLink) {
-        accountLink.textContent = currentUser ? '👤 ' + currentUser : '👤 账号';
-    }
-}
-
-        // ===== 初始化 =====
+        // ============================================================
+        // 初始化
+        // ============================================================
         function initForum() {
-            document.querySelectorAll('.forum-section').forEach(section => renderPosts(section.id));
+            document.querySelectorAll('.forum-section').forEach(function(section) {
+                renderPosts(section.id);
+            });
+            updateAccountBtn();
         }
-        initForum();
-   
-       
 
+        initForum();
 
         console.log('🎮 论坛加载完成！');
         console.log('📝 发帖功能已加载！');
