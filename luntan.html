@@ -1156,50 +1156,7 @@ function renderPosts(sectionId) {
             return;
         }
 
-        sectionPosts.forEach(function(post) {
-            var item = document.createElement('div');
-            item.className = 'post-item';
-            item.style.cursor = 'pointer';
-
-            item.addEventListener('click', function() {
-                openDetail(post.id);
-            });
-
-            var titleDiv = document.createElement('div');
-            titleDiv.className = 'title';
-            titleDiv.textContent = post.title;
-            item.appendChild(titleDiv);
-
-            var contentDiv = document.createElement('div');
-            contentDiv.className = 'content-preview';
-            contentDiv.textContent = post.content.length > 60 ? post.content.slice(0, 60) + '...' : post.content;
-            item.appendChild(contentDiv);
-
-            var meta = document.createElement('div');
-            meta.className = 'meta';
-            var commentCount = (post.comments ? post.comments.length : 0);
-            meta.innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
-            item.appendChild(meta);
-
-            if (post.tags && post.tags.length > 0) {
-                var tagsDiv = document.createElement('div');
-                tagsDiv.className = 'tags';
-                post.tags.forEach(function(tag) {
-                    var span = document.createElement('span');
-                    span.className = 'tag';
-                    span.textContent = tag;
-                    tagsDiv.appendChild(span);
-                });
-                item.appendChild(tagsDiv);
-            }
-
-            section.appendChild(item);
-        });
-    })
-    .catch(function(err) {
-        console.error('加载帖子失败:', err);
-        section.innerHTML = '<p style="color:red; padding:20px;">加载帖子失败，请刷新重试</p>';
-    });
+       
 }
             // 生成卡片
             sectionPosts.forEach(function(post) {
