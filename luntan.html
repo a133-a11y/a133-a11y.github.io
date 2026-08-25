@@ -1101,50 +1101,106 @@ function savePostsToGitHub(postsData) {
         // ============================================================
         // ⭐ 核心：渲染帖子（生成卡片）
         // ============================================================
-        function renderPosts(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
+        // ============================================================
+// ⭐ 核心：渲染帖子（从 GitHub 读取）
+// ============================================================
+function renderPosts(sectionId) {
+    var section = document.getElementById(sectionId);
+    if (!section) return;
 
-            const posts = getPosts();
-            const sectionPosts = posts.filter(p => p.section === sectionId);
+    // 从 GitHub 读取帖子
+    fetchPostsFromGitHub()
+    .then(function(data) {
+        var allPosts = data.posts || [];
+        var sectionPosts = allPosts.filter(function(p) { return p.section === sectionId; });
 
-            // 保留 header
-            let header = section.querySelector('.section-header');
-            section.innerHTML = '';
+        // 保留 header
+        var header = section.querySelector('.section-header');
+        section.innerHTML = '';
 
-            if (!header) {
-                header = document.createElement('div');
-                header.className = 'section-header';
-                const h2 = document.createElement('h2');
-                const nameMap = {
-                    'section-general': '📋 综合讨论',
-                    'section-survival': '⚡ 生电专区',
-                    'section-pvp': '⚔️ PVP专区',
-                    'section-mod': '🧩 MOD专区'
-                };
-                h2.textContent = nameMap[sectionId] || sectionId;
-                header.appendChild(h2);
+        if (!header) {
+            header = document.createElement('div');
+            header.className = 'section-header';
+            var h2 = document.createElement('h2');
+            var nameMap = {
+                'section-general': '📋 综合讨论',
+                'section-survival': '⚡ 生电专区',
+                'section-pvp': '⚔️ PVP专区',
+                'section-mod': '🧩 MOD专区'
+            };
+            h2.textContent = nameMap[sectionId] || sectionId;
+            header.appendChild(h2);
 
-                const btn = document.createElement('button');
-                btn.className = 'new-post-btn';
-                btn.textContent = '📝 发帖';
-                btn.onclick = function(e) {
-                    e.stopPropagation();
-                    document.getElementById('postSection').value = sectionId;
-                    openPostModal();
-                };
-                header.appendChild(btn);
+            var btn = document.createElement('button');
+            btn.className = 'new-post-btn';
+            btn.textContent = '📝 发帖';
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                document.getElementById('postSection').value = sectionId;
+                openPostModal();
+            };
+
+            // 根据登录状态显示/隐藏发帖按钮
+            var currentUser = localStorage.getItem('forum_current_user');
+            btn.style.display = currentUser ? 'inline-block' : 'none';
+
+            header.appendChild(btn);
+        }
+        section.appendChild(header);
+
+        if (sectionPosts.length === 0) {
+            var empty = document.createElement('div');
+            empty.className = 'empty-posts';
+            empty.textContent = '📭 还没有帖子，快来发布第一个吧！';
+            section.appendChild(empty);
+            return;
+        }
+
+        sectionPosts.forEach(function(post) {
+            var item = document.createElement('div');
+            item.className = 'post-item';
+            item.style.cursor = 'pointer';
+
+            item.addEventListener('click', function() {
+                openDetail(post.id);
+            });
+
+            var titleDiv = document.createElement('div');
+            titleDiv.className = 'title';
+            titleDiv.textContent = post.title;
+            item.appendChild(titleDiv);
+
+            var contentDiv = document.createElement('div');
+            contentDiv.className = 'content-preview';
+            contentDiv.textContent = post.content.length > 60 ? post.content.slice(0, 60) + '...' : post.content;
+            item.appendChild(contentDiv);
+
+            var meta = document.createElement('div');
+            meta.className = 'meta';
+            var commentCount = (post.comments ? post.comments.length : 0);
+            meta.innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+            item.appendChild(meta);
+
+            if (post.tags && post.tags.length > 0) {
+                var tagsDiv = document.createElement('div');
+                tagsDiv.className = 'tags';
+                post.tags.forEach(function(tag) {
+                    var span = document.createElement('span');
+                    span.className = 'tag';
+                    span.textContent = tag;
+                    tagsDiv.appendChild(span);
+                });
+                item.appendChild(tagsDiv);
             }
-            section.appendChild(header);
 
-            if (sectionPosts.length === 0) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-posts';
-                empty.textContent = '📭 还没有帖子，快来发布第一个吧！';
-                section.appendChild(empty);
-                return;
-            }
-
+            section.appendChild(item);
+        });
+    })
+    .catch(function(err) {
+        console.error('加载帖子失败:', err);
+        section.innerHTML = '<p style="color:red; padding:20px;">加载帖子失败，请刷新重试</p>';
+    });
+}
             // 生成卡片
             sectionPosts.forEach(function(post) {
                 const item = document.createElement('div');
@@ -1191,32 +1247,44 @@ function savePostsToGitHub(postsData) {
         let currentPostId = null;
 
         function openDetail(postId) {
-            const posts = getPosts();
-            let post = posts.find(p => p.id === postId);
-            if (!post) { alert('帖子不存在'); return; }
-
-            currentPostId = postId;
-            document.getElementById('detailTitle').textContent = post.title;
-            const commentCount = (post.comments ? post.comments.length : 0);
-            document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
-            document.getElementById('detailContent').textContent = post.content;
-
-            const tagsContainer = document.getElementById('detailTags');
-            tagsContainer.innerHTML = '';
-            if (post.tags && post.tags.length > 0) {
-                post.tags.forEach(function(tag) {
-                    const span = document.createElement('span');
-                    span.className = 'tag';
-                    span.textContent = tag;
-                    tagsContainer.appendChild(span);
-                });
+    // 从 GitHub 读取帖子
+    fetchPostsFromGitHub()
+    .then(function(posts) {
+        var post = null;
+        for (var i = 0; i < posts.posts.length; i++) {
+            if (posts.posts[i].id === postId) {
+                post = posts.posts[i];
+                break;
             }
+        }
+        if (!post) { alert('帖子不存在'); return; }
 
-            renderComments(post);
-            document.getElementById('detailModal').classList.add('show');
-            document.getElementById('commentInput').focus();
+        currentPostId = postId;
+        document.getElementById('detailTitle').textContent = post.title;
+        var commentCount = (post.comments ? post.comments.length : 0);
+        document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + commentCount + ' 评论</span>';
+        document.getElementById('detailContent').textContent = post.content;
+
+        var tagsContainer = document.getElementById('detailTags');
+        tagsContainer.innerHTML = '';
+        if (post.tags && post.tags.length > 0) {
+            post.tags.forEach(function(tag) {
+                var span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
+            });
         }
 
+        renderComments(post);
+        document.getElementById('detailModal').classList.add('show');
+        document.getElementById('commentInput').focus();
+    })
+    .catch(function(err) {
+        console.error('加载帖子详情失败:', err);
+        alert('加载帖子失败，请刷新重试');
+    });
+}
         function closeDetail() {
             document.getElementById('detailModal').classList.remove('show');
             currentPostId = null;
@@ -1247,39 +1315,59 @@ function savePostsToGitHub(postsData) {
         }
 
         function submitComment() {
-            const input = document.getElementById('commentInput');
-            const text = input.value.trim();
-            if (!text) { alert('请输入评论内容！'); return; }
-            if (text.length < 2) { alert('评论至少2个字符！'); return; }
-            if (!currentPostId) { alert('请先打开一个帖子！'); return; }
+    var input = document.getElementById('commentInput');
+    var text = input.value.trim();
+    if (!text) { alert('请输入评论内容！'); return; }
+    if (text.length < 2) { alert('评论至少2个字符！'); return; }
+    if (!currentPostId) { alert('请先打开一个帖子！'); return; }
 
-            const posts = getPosts();
-            let post = posts.find(p => p.id === currentPostId);
-            if (!post) { alert('帖子已不存在'); return; }
+    var username = localStorage.getItem('forum_current_user') || '匿名玩家';
 
-            const username = localStorage.getItem('forum_current_user') || '匿名玩家';
-            if (!post.comments) post.comments = [];
-            post.comments.push({ author: username, text: text, date: new Date().toISOString().slice(0, 10) });
-            post.replies = post.comments.length;
-            savePosts(posts);
-
-            input.value = '';
-            renderComments(post);
-            document.getElementById('detailMeta').innerHTML = '<span>👤 ' + post.author + '</span><span>📅 ' + post.date + '</span><span>💬 ' + post.comments.length + ' 评论</span>';
-
-            const activeSection = document.querySelector('.forum-section.active');
-            if (activeSection) renderPosts(activeSection.id);
+    fetchPostsFromGitHub()
+    .then(function(data) {
+        var posts = data.posts || [];
+        var post = null;
+        for (var i = 0; i < posts.length; i++) {
+            if (posts[i].id === currentPostId) {
+                post = posts[i];
+                break;
+            }
         }
+        if (!post) { alert('帖子已不存在'); return; }
 
-        document.getElementById('commentInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') submitComment();
+        if (!post.comments) post.comments = [];
+        post.comments.push({ 
+            author: username, 
+            text: text, 
+            date: new Date().toISOString().slice(0, 10) 
         });
+        post.replies = post.comments.length;
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        // 更新 posts 数组中的对应帖子
+        for (var j = 0; j < posts.length; j++) {
+            if (posts[j].id === currentPostId) {
+                posts[j] = post;
+                break;
+            }
         }
+
+        return savePostsToGitHub({ posts: posts });
+    })
+    .then(function() {
+        input.value = '';
+        // 重新加载帖子详情刷新评论
+        openDetail(currentPostId);
+        // 刷新帖子列表
+        var activeSection = document.querySelector('.forum-section.active');
+        if (activeSection) {
+            renderPosts(activeSection.id);
+        }
+    })
+    .catch(function(err) {
+        console.error('评论失败:', err);
+        alert('评论失败，请重试');
+    });
+}
 // ============================================================
 // 账号按钮：显示当前登录用户，询问是否退出
 // ============================================================
