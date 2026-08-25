@@ -843,58 +843,39 @@ var POSTS_FILE = 'posts.json';
         // ============================================================
         // 从 GitHub 读取 posts.json
         // ============================================================
-v
+function fetchPostsFromGitHub() {
+    var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
 
-        // ============================================================
-        // 写入 posts.json 到 GitHub
-        // ============================================================
-        function savePostsToGitHub(postsData) {
-            var url = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/' + POSTS_FILE;
-
-            var content = JSON.stringify(postsData, null, 2);
-
-            return fetch(url, {
-                headers: {
-                    'Authorization': 'token ' + GITHUB_TOKEN,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            })
-            .then(function(res) {
-                if (res.status === 404) {
-                    return { sha: null };
-                }
-                return res.json();
-            })
-            .then(function(fileInfo) {
-                var payload = {
-                    message: '更新帖子',
-                    content: btoa(unescape(encodeURIComponent(content))),
-                    branch: 'main'
-                };
-                if (fileInfo.sha) {
-                    payload.sha = fileInfo.sha;
-                }
-
-                return fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'token ' + GITHUB_TOKEN,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-            })
-            .then(function(res) {
-                if (!res.ok) {
-                    return res.json().then(function(err) {
-                        throw new Error('写入失败: ' + JSON.stringify(err));
-                    });
-                }
-                return res.json();
-            });
+    return fetch(url, {
+        headers: {
+            'Authorization': 'token ' + GITHUB_TOKEN,
+            'Accept': 'application/vnd.github.v3+json'
         }
-
+    })
+    .then(function(res) {
+        if (!res.ok) {
+            if (res.status === 404) {
+                return { posts: [] };
+            }
+            throw new Error('读取帖子失败: ' + res.status);
+        }
+        return res.json();
+    })
+    .then(function(data) {
+        // 正确解码 UTF-8 中文
+        var binary = atob(data.content);
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        var decoded = new TextDecoder('utf-8').decode(bytes);
+        return JSON.parse(decoded);
+    })
+    .catch(function(err) {
+        console.error('读取帖子失败:', err);
+        return { posts: [] };
+    });
+}
         // ============================================================
         // 侧边栏切换
         // ============================================================
